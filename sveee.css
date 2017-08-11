@@ -1,0 +1,90 @@
+a {
+    text-decoration: none;
+    display: inline-block;
+    padding: 8px 16px;
+}
+
+a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+.previous {
+    color: black;
+    border: none;
+    background: white;
+    font-size: 15px;
+}
+
+.next {
+    color: black;
+    float:right;
+    display:block;
+    margin-right:0px;
+    clear:left;
+    border: none;
+    background: white;
+    font-size: 15px;
+}
+
+.score_button {
+    border: none;
+    color: white;
+    padding: 3% 10%;
+    font-size: 1em;
+    cursor: pointer;
+    border: 1px solid black;
+}
+
+.good_button {
+    margin-left: 25%;
+    background-color: #008CBA;
+}
+
+.good_button_dark {
+    background-color: #37479e;
+}
+
+.bad_button {
+    background-color: #ba004c;
+    margin-left: 1%;
+}
+.bad_button_dark {
+    background-color: #79304a;
+}
+
+.endMsg {
+    text-align: center;
+    font-size: 1.5em;
+    text-decoration: underline;
+    font-style: italic;
+}
+
+.instructions {
+    text-align: center;
+    font-size: 1em;
+}
+
+.viewer {
+    width: 50%;
+    border: 2px solid black;
+    padding: 10px;
+    margin: auto;
+}
+
+.viewerBad {
+    border: 3px solid #ba004c;
+}
+.viewerGood {
+    border: 3px solid #008CBA;
+}
+
+.button_box {
+    width: 50%;
+    padding: 10px;
+    margin: auto;
+}
+
+.variantImg {
+    width:100%;
+}

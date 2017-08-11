@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>NA12878</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+	<script src="https://sdk.amazonaws.com/js/aws-sdk-2.92.0.min.js"></script>
+	<link rel="stylesheet" href="sveee.css">
+  </head>
+
+<body>
+
+	<div ng-app="svApp" ng-controller="svCtrl">
+	<div class="instructions"><p>Click buttons at bottom or use 'b' and 'g' keys to evaluate variant quality</p>
+	    </div>
+	<div keypress-events></div>
+	<div class="viewer" ng-class="viewerSelected">
+		    <img class="variantImg" ng-src="{{currentImage}}">
+		    <div class="button_box">
+			    <button type="button" class="score_button" ng-class="goodButton" ng-click=goodVariant()>Good</button>
+				<button type="button" class="score_button" ng-class="badButton" ng-click=badVariant()>Bad</button>
+			</div>
+	</div>
+
+	    <div class="endMsg" ng-show="reachedEnd"><p>You have reached the end of the available variants</p>
+	    </div>
+	    <div class="endMsg" ng-show="reachedStart"><p>You have reached the beginning of the available variants</p>
+	    </div>
+	    <div class="button_box">
+		    <button class="previous" ng-click=previous()>&laquo; Previous</a>
+			<button class="next" ng-click=next()>Next &raquo;</a>
+		</div>
+	</div>
+
+	<script src="sveee.js"></script>
+</body>
+</html
