@@ -18,19 +18,19 @@
 		  <input type="email" ng-model="email" name="text" />
 		  <input type="submit" id="submit" value="Submit"/>
 		</form>
-
+		<p class='disclaimer'>Your email address will not be used to send unsolicited messages.</p>
 	</div>
 	<div class="userEmail" ng-show="hide">
 		<p>{{email}}</p>
 	</div>
 	<div ng-show="hide" class=main_frame>
-		<div class="instructions"><p>Click buttons at bottom or use 'b' and 'g' keys to evaluate variant quality</p></div>
+		<div class="instructions"><p>Click buttons at bottom or use 'g', 'u', and 'b' keys to evaluate variant quality</p></div>
 		<div keypress-events ></div>
 		<div class="viewer" >
 		    <img ng-class="variantImgSelected" class='variantImg' ng-src="{{currentImage}}">
 		    <div class="button_box">
 			    <button type="button" class="score_button" ng-class="goodButton" ng-click=goodVariant()>Good</button>
-			    <button type="button" class="score_button" ng-class="unclearButton" ng-click=unclearVariant()>Can't Tell</button>
+			    <button type="button" class="score_button" ng-class="unclearButton" ng-click=unclearVariant()>Unknown</button>
 				<button type="button" class="score_button" ng-class="badButton" ng-click=badVariant()>Bad</button>
 			</div>
 		</div>

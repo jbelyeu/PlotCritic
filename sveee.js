@@ -42,6 +42,9 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout) {
 	            else if (key == 'b' || key == 'B') {
 	            	$scope.badVariant();
 	            }
+	            else if (key == 'u' || key == 'U') {
+	            	$scope.unclearVariant();
+	            }
         	}            
         });
     })
