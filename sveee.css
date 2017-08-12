@@ -9,15 +9,7 @@ a:hover {
     color: black;
 }
 
-.previous {
-    color: black;
-    border: none;
-    background: white;
-    font-size: 15px;
-}
-
-.next {
-    color: black;
+.end {
     float:right;
     display:block;
     margin-right:0px;
@@ -25,19 +17,36 @@ a:hover {
     border: none;
     background: white;
     font-size: 15px;
+    cursor: pointer;
 }
 
+.nav_button {
+    cursor: pointer;
+    color: black;
+    border: none;
+    background: white;
+    font-size: 1em;
+    text-decoration: underline;
+}
+
+.nav_box {
+    display: -webkit-box;
+    position: absolute;
+    left: 31%;
+}
 .score_button {
     border: none;
     color: white;
-    padding: 3% 10%;
+    padding: 1% 5%;
     font-size: 1em;
     cursor: pointer;
     border: 1px solid black;
 }
+.outliner {
 
+}
 .good_button {
-    margin-left: 25%;
+    /*margin-left: 25%;*/
     background-color: #008CBA;
 }
 
@@ -47,12 +56,17 @@ a:hover {
 
 .bad_button {
     background-color: #ba004c;
-    margin-left: 1%;
+    /*margin-left: 1%;*/
 }
 .bad_button_dark {
     background-color: #79304a;
 }
-
+.unclear_button {
+    background-color: darkgrey;
+}
+.unclear_button_dark {
+    background-color: #585555;
+}
 .endMsg {
     text-align: center;
     font-size: 1.5em;
@@ -66,17 +80,22 @@ a:hover {
 }
 
 .viewer {
-    width: 50%;
-    border: 2px solid black;
+    width: fit-content;
+    /*border: 2px solid black;*/
     padding: 10px;
-    margin: auto;
+
+    width:810vw;
+    height:80vh;
+    display:table-cell;
+    vertical-align:middle;
+    text-align:center;
 }
 
-.viewerBad {
-    border: 3px solid #ba004c;
+.variantImgBad {
+    border: 5px solid #ba004c !important;
 }
-.viewerGood {
-    border: 3px solid #008CBA;
+.variantImgGood {
+    border: 5px solid #008CBA !important;
 }
 
 .button_box {
@@ -86,5 +105,32 @@ a:hover {
 }
 
 .variantImg {
-    width:100%;
+    max-width:100%;
+    height:auto;
+    max-height:100%;
+    border: 2px solid black;
+}
+
+.userEmail {
+    position: absolute;
+    right: 2%;
+    top: 0%;
+    font-style: italic;
+    font-size: 1.1em;
+}
+
+.emailInput {
+    width: 25%;
+    height: 100px;
+
+    position: absolute;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    margin: auto;
+}
+.right_button_box {
+    margin-left: 50%;
 }
