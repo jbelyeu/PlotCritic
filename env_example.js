@@ -3,7 +3,7 @@
 
   window.__env.config = {
 	  "accessKey": "",
-	  "secretAccessKey": "",
+	  "secretAccessKey": "/qkAQVtJyzAV42bVx7wOI",
 	  "dynamoEndpoint" : "",
 	  "region" : "",
 	  "dynamoTable" : "",
@@ -12,5 +12,3 @@
 	  "allowedImageTypes" : ["png", "jpg", "jpeg"]
 	}
 }(this));
-
-
