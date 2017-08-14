@@ -1,0 +1,10 @@
+{
+	"accessKey": "",
+	"secretAccessKey": "",
+	"dynamoEndpoint" : "",
+	"region" : "",
+	"dynamoTable" : "",
+	"AWSBucketName" : "",
+	"AWSBucketURl" : "",
+	"allowedImageTypes" : ["png", "jpg", "jpeg"]
+}
