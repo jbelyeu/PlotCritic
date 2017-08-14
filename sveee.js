@@ -1,4 +1,11 @@
+// Import variables if present (from env.js)
+var env = {};
+if(window){  
+  Object.assign(env, window.__env);
+}
+
 var app = angular.module("svApp", []);
+app.constant('__env', env);
 
 app.directive('keypressEvents',
 function ($document, $rootScope) {
@@ -12,10 +19,9 @@ function ($document, $rootScope) {
     }
 });
 
-app.controller("svCtrl", function($scope, $rootScope, $timeout) {
+app.controller("svCtrl", function($scope, $rootScope, $timeout, $http) {
 	$scope.images = [];
 	$scope.currentImageIdx = 0;
-	$scope.imgsURL = "http://sveee.s3-website-us-east-1.amazonaws.com/";
 	$scope.currentImage = '';
 	$scope.goodButton = ["good_button"];
 	$scope.badButton = ["bad_button"];
@@ -25,13 +31,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout) {
 	$scope.reachedStart = false;
 	$scope.email = '';
 	$scope.hide = false;
-	var accessKey = 'AKIAI63BOTTCFQX556OQ';
-	var secretAccessKey = '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';
-	var dynamoEndpoint = 'https://dynamodb.us-east-1.amazonaws.com';
-	var region = 'us-east-1';
-	var dynamoTable = 'sveee';
-	var bucketName = 'sveee';
-	var imgTypes = ['.png', ".jpg", ".jpeg"];
+	var project = '';
 
     $rootScope.$on('keypress', function (evt, obj, key) {
         $scope.$apply(function () {
@@ -51,22 +51,23 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout) {
 
 	var sendScore = function(flag) {
 		AWS.config.update({
-			accessKeyId: accessKey, 
-			secretAccessKey: secretAccessKey,
-			endpoint: dynamoEndpoint,
-			region: region
+			accessKeyId: __env.config.accessKey, 
+			secretAccessKey: __env.config.secretAccessKey,
+			endpoint: __env.config.dynamoEndpoint,
+			region: __env.config.region
 		});
 
 		var docClient = new AWS.DynamoDB.DocumentClient();
-		var now = new Date();
+		var now = Date.now();
 		var params = {
-		    TableName:dynamoTable,
+		    TableName:__env.config.dynamoTable,
 		    Item:{
-		    	'identifier': $scope.email + "_" + $scope.currentImage,
+		    	'identifier': $scope.email + "_" + now,
 		        "email": $scope.email,
 		        'image': $scope.currentImage,
-		        'bucket': $scope.imgsURL,
-		        'timestamp': now.toString(),
+		        'bucket': __env.config.AWSBucketURl,
+		        'timestamp': now,
+		        'project' : project,
 		        'score': flag
 		    }
 		};
@@ -78,26 +79,30 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout) {
 	};
 
 	var init = function () {
-		var config = new AWS.Config({accessKeyId: accessKey, secretAccessKey: secretAccessKey, region: region});
-
+		var config = new AWS.Config({accessKeyId: __env.config.accessKey, secretAccessKey: __env.config.secretAccessKey, region: __env.config.region});
 		var bucket = new AWS.S3(config);
-		bucket.listObjects({Bucket: bucketName}, function (err, data) {
+		bucket.listObjects({Bucket: __env.config.AWSBucketName}, function (err, data) {
 		    if (err) {
 		      console.log(err);
 		    } else {
 		    	for (var i = 0; i < data.Contents.length; i++) {
 		    		var resourceName = data.Contents[i]['Key'];
-		    		if (resourceName.substring(resourceName.length-4) == imgTypes[0] || 
-		    			resourceName.substring(resourceName.length-4) == imgTypes[1] || 
-		    			resourceName.substring(resourceName.length-5) == imgTypes[2]) {
-		    			resourceName = $scope.imgsURL + resourceName;
-
+		    		if (resourceName[resourceName.length-1] === '/') {
+		    			continue
+		    		}
+		    		fileExtList = resourceName.split('.');
+		    		fileExt = fileExtList[fileExtList.length-1];
+		    		if ( __env.config.allowedImageTypes.indexOf(fileExt) > -1 ) {
+		    			resourceName = __env.config.AWSBucketURl + resourceName;
 		    			$scope.images.push(resourceName);
 		    		}
 		    	}
 			    shuffleArray($scope.images);
 		    }
+		    //TODO should check whether there are any images and error smoothly if not.
     		$scope.currentImage = $scope.images[$scope.currentImageIdx];
+    		var projectFields = $scope.currentImage.replace(__env.config.AWSBucketURl, '').split("/")
+			project = projectFields.slice(0,projectFields.length-1).join("/");
 		});
 	};
 
@@ -111,6 +116,8 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout) {
 	var resetCurrent = function (change) {
 		$scope.currentImageIdx += change;
 		$scope.currentImage = $scope.images[$scope.currentImageIdx];
+		var projectFields = $scope.currentImage.replace(__env.config.AWSBucketURl, '').split("/")
+		project = projectFields.slice(0,projectFields.length-1).join("/");
 	};
 
 	//scope functions
