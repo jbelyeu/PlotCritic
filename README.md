@@ -4,6 +4,7 @@ Purpose of the tool is to simplify creation of a high-quality truth set of struc
 Web page displays image files of read alignments for visual scoring and sends scores to DynamoDB back end.
 
 Python script "retrieval.py" retrieves data from the DynamoDB table and, currently, prints it out.
+Must install python library boto3 (available from conda)
 It requires an AWS config file (by default referred to as ~/.aws/credentials).
 That config file follows the following format:
 
