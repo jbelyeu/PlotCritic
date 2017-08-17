@@ -1,5 +1,5 @@
 # sveee
-Contains code for both the website and data retrieval script for sveee.
+Contains code for both the [website](http://home.chpc.utah.edu/~u1072557/sveee/sveee.html) and data retrieval script for sveee.
 Purpose of the tool is to simplify creation of a high-quality truth set of structural variants.
 Web page displays image files of read alignments for visual scoring and sends scores to DynamoDB back end.
 
