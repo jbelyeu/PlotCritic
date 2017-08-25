@@ -115,9 +115,6 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http) {
 
 	var resetCurrent = function (change) {
 		$scope.currentImageIdx += change;
-		console.log("bob");
-		console.log($scope.currentImageIdx);
-		console.log($scope.images.length);
 		$scope.currentImage = $scope.images[$scope.currentImageIdx];
 		var projectFields = $scope.currentImage.replace(__env.config.AWSBucketURl, '').split("/")
 		project = projectFields.slice(0,projectFields.length-1).join("/");
