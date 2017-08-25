@@ -115,6 +115,9 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http) {
 
 	var resetCurrent = function (change) {
 		$scope.currentImageIdx += change;
+		console.log("bob");
+		console.log($scope.currentImageIdx);
+		console.log($scope.images.length);
 		$scope.currentImage = $scope.images[$scope.currentImageIdx];
 		var projectFields = $scope.currentImage.replace(__env.config.AWSBucketURl, '').split("/")
 		project = projectFields.slice(0,projectFields.length-1).join("/");
@@ -159,7 +162,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http) {
 		$scope.reachedStart = false;
 
 		if ($scope.currentImageIdx -1 > 0) {
-			resetCurrent(1);
+			resetCurrent(-1);
 		}
 		else {
 			$scope.reachedStart = true;
@@ -187,7 +190,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http) {
 		}
 	};
 	$scope.ending = function () {
-		resetCurrent($scope.images.length-$scope.currentImageIdx);
+		resetCurrent(($scope.images.length-1)-$scope.currentImageIdx);
 		$scope.reachedEnd = true;
 
 		if ($scope.currentImageIdx !== 0) {
