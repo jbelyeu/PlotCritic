@@ -3,7 +3,7 @@
 
   window.__env.config = {
 	  "accessKey": "",
-	  "secretAccessKey": "/qkAQVtJyzAV42bVx7wOI",
+	  "secretAccessKey": "",
 	  "dynamoRegion" : "",
 	  "dynamoTable" : "",
 	  "region" : "",
