@@ -53,8 +53,8 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http) {
 		AWS.config.update({
 			accessKeyId: __env.config.accessKey, 
 			secretAccessKey: __env.config.secretAccessKey,
-			endpoint: __env.config.dynamoEndpoint,
-			region: __env.config.region
+			endpoint: "https://dynamodb." + __env.config.dynamoRegion + ".amazonaws.com",
+			region: __env.config.dynamoRegion
 		});
 
 		var docClient = new AWS.DynamoDB.DocumentClient();
@@ -79,7 +79,12 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http) {
 	};
 
 	var init = function () {
-		var config = new AWS.Config({accessKeyId: __env.config.accessKey, secretAccessKey: __env.config.secretAccessKey, region: __env.config.region});
+		var config = new AWS.Config({
+                    accessKeyId: __env.config.accessKey, 
+                    secretAccessKey: __env.config.secretAccessKey, 
+                    region: __env.config.region
+                });
+
 		var bucket = new AWS.S3(config);
 		bucket.listObjects({Bucket: __env.config.AWSBucketName}, function (err, data) {
 		    if (err) {

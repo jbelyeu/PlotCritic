@@ -4,9 +4,9 @@
   window.__env.config = {
 	  "accessKey": "",
 	  "secretAccessKey": "/qkAQVtJyzAV42bVx7wOI",
-	  "dynamoEndpoint" : "",
-	  "region" : "",
+	  "dynamoRegion" : "",
 	  "dynamoTable" : "",
+	  "region" : "",
 	  "AWSBucketName" : "",
 	  "AWSBucketURl" : "",
 	  "allowedImageTypes" : ["png", "jpg", "jpeg"]
