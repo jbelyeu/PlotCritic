@@ -8,6 +8,7 @@
 	  "dynamoTable" : "",
 	  "region" : "",
 	  "AWSBucketName" : "",
+	  "projectName" : "",
 	  "AWSBucketURl" : "",
 	  "allowedImageTypes" : ["png", "jpg", "jpeg"]
 	}

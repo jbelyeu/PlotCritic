@@ -31,7 +31,6 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http) {
 	$scope.reachedStart = false;
 	$scope.email = '';
 	$scope.hide = false;
-	var project = '';
 
     $rootScope.$on('keypress', function (evt, obj, key) {
         $scope.$apply(function () {
@@ -67,7 +66,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http) {
 		        'image': $scope.currentImage,
 		        'bucket': __env.config.AWSBucketURl,
 		        'timestamp': now,
-		        'project' : project,
+		        'project' : __env.config.projectName,
 		        'score': flag
 		    }
 		};
@@ -97,7 +96,9 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http) {
 		    		}
 		    		fileExtList = resourceName.split('.');
 		    		fileExt = fileExtList[fileExtList.length-1];
-		    		if ( __env.config.allowedImageTypes.indexOf(fileExt) > -1 ) {
+
+		    		if (__env.config.projectName === resourceName.substring(0, __env.config.projectName.length) &&
+		    			 __env.config.allowedImageTypes.indexOf(fileExt) > -1) {
 		    			resourceName = __env.config.AWSBucketURl + resourceName;
 		    			$scope.images.push(resourceName);
 		    		}
@@ -106,8 +107,6 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http) {
 		    }
 		    //TODO should check whether there are any images and error smoothly if not.
     		$scope.currentImage = $scope.images[$scope.currentImageIdx];
-    		var projectFields = $scope.currentImage.replace(__env.config.AWSBucketURl, '').split("/")
-			project = projectFields.slice(0,projectFields.length-1).join("/");
 		});
 	};
 
@@ -121,8 +120,6 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http) {
 	var resetCurrent = function (change) {
 		$scope.currentImageIdx += change;
 		$scope.currentImage = $scope.images[$scope.currentImageIdx];
-		var projectFields = $scope.currentImage.replace(__env.config.AWSBucketURl, '').split("/")
-		project = projectFields.slice(0,projectFields.length-1).join("/");
 	};
 
 	//scope functions
