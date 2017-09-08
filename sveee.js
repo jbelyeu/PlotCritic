@@ -5,6 +5,8 @@ if(window){
 }
 
 var app = angular.module("svApp", []);
+
+
 app.constant('__env', env);
 
 app.directive('keypressEvents',
@@ -19,10 +21,40 @@ function ($document, $rootScope) {
     }
 });
 
+app.directive("setImgScripts", function() {
+ 
+    var updateScripts = function (element) {
+        return function (scripts) {
+            element.empty();
+            angular.forEach(scripts, function (script) {
+            	
+                var scriptTag = angular.element(document.createElement("script"));
+                scriptTag[0]['src'] = script['src'];
+                scriptTag[0]['id'] = script['id'];
+                scriptTag[0]['data-bokeh-model-id'] = script['data-bokeh-model-id'];
+                scriptTag[0]['data-bokeh-doc-id'] = script['data-bokeh-doc-id'];
+
+                element.append(scriptTag);
+            });
+        };
+    };
+ 
+    return {
+        restrict: "EA",
+        scope: {
+          scripts: "=" 
+        },
+        link: function(scope,element) {
+            scope.$watch("scripts", updateScripts(element));
+        }
+    };
+});
+
 app.controller("svCtrl", function($scope, $rootScope, $timeout, $http) {
+
+	$scope.scripts = [];
 	$scope.images = [];
 	$scope.currentImageIdx = 0;
-	$scope.currentImage = '';
 	$scope.goodButton = ["good_button"];
 	$scope.badButton = ["bad_button"];
 	$scope.unclearButton = ["unclear_button"];
@@ -31,10 +63,12 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http) {
 	$scope.reachedStart = false;
 	$scope.email = '';
 	$scope.hide = false;
+	$scope.html_url = "";
+
 
     $rootScope.$on('keypress', function (evt, obj, key) {
         $scope.$apply(function () {
-        	if ($scope.currentImage != "") {
+        	if ($scope.scripts.length > 0) {
         		if (key == 'g' || key == 'G') {
 	            	$scope.goodVariant();
 	            }
@@ -59,11 +93,11 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http) {
 		var docClient = new AWS.DynamoDB.DocumentClient();
 		var now = Date.now();
 		var params = {
-		    TableName:__env.config.dynamoTable,
+		    TableName:__env.config.dynamoScoresTable,
 		    Item:{
 		    	'identifier': $scope.email + "_" + now,
 		        "email": $scope.email,
-		        'image': $scope.currentImage,
+		        'image': $scope.images[$scope.currentImageIdx]['script']['src'],
 		        'bucket': __env.config.AWSBucketURl,
 		        'timestamp': now,
 		        'project' : __env.config.projectName,
@@ -78,48 +112,44 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http) {
 	};
 
 	var init = function () {
-		var config = new AWS.Config({
-                    accessKeyId: __env.config.accessKey, 
-                    secretAccessKey: __env.config.secretAccessKey, 
-                    region: __env.config.region
-                });
 
-		var bucket = new AWS.S3(config);
-		bucket.listObjects({Bucket: __env.config.AWSBucketName}, function (err, data) {
+		AWS.config.update({
+			accessKeyId: __env.config.accessKey, 
+			secretAccessKey: __env.config.secretAccessKey,
+			endpoint: "https://dynamodb." + __env.config.dynamoRegion + ".amazonaws.com",
+			region: __env.config.dynamoRegion
+		});
+
+		var docClient = new AWS.DynamoDB.DocumentClient();
+
+		var params = {
+  			TableName: __env.config.dynamoImagesTable
+		};
+		docClient.scan(params, function(err, data) {
 		    if (err) {
-		      console.log(err);
-		    } else {
-		    	for (var i = 0; i < data.Contents.length; i++) {
-		    		var resourceName = data.Contents[i]['Key'];
-		    		if (resourceName[resourceName.length-1] === '/') {
-		    			continue
-		    		}
-		    		fileExtList = resourceName.split('.');
-		    		fileExt = fileExtList[fileExtList.length-1];
-
-		    		if (__env.config.projectName === resourceName.substring(0, __env.config.projectName.length) &&
-		    			 __env.config.allowedImageTypes.indexOf(fileExt) > -1) {
-		    			resourceName = __env.config.AWSBucketURl + resourceName;
-		    			$scope.images.push(resourceName);
-		    		}
-		    	}
-			    shuffleArray($scope.images);
+		        console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
 		    }
-		    //TODO should check whether there are any images and error smoothly if not.
-    		$scope.currentImage = $scope.images[$scope.currentImageIdx];
+		    else {
+		    	$scope.images = shuffleArray(data['Items']);
+		    	resetCurrent(0);
+		    }
 		});
 	};
 
 	var shuffleArray = function (arr) {
-		for (let i = $scope.images.length; i; i--) {
-	        let j = Math.floor(Math.random() * i);
-	        [$scope.images[i - 1], $scope.images[j]] = [$scope.images[j], $scope.images[i - 1]];
+	    for (var i = arr.length - 1; i > 0; i--) {
+	        var j = Math.floor(Math.random() * (i + 1));
+	        var temp = arr[i];
+	        arr[i] = arr[j];
+	        arr[j] = temp;
 	    }
-	}
+	    return arr;
+	};
 
 	var resetCurrent = function (change) {
 		$scope.currentImageIdx += change;
-		$scope.currentImage = $scope.images[$scope.currentImageIdx];
+		$scope.scripts = [$scope.images[$scope.currentImageIdx]['script']];
+
 	};
 
 	//scope functions
@@ -189,16 +219,16 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http) {
 		}
 	};
 	$scope.ending = function () {
-		resetCurrent(($scope.images.length-1)-$scope.currentImageIdx);
-		$scope.reachedEnd = true;
+			resetCurrent(($scope.images.length-1)-$scope.currentImageIdx);
+			$scope.reachedEnd = true;
 
-		if ($scope.currentImageIdx !== 0) {
-			$scope.reachedStart = false;
-		}
+			if ($scope.currentImageIdx !== 0) {
+				$scope.reachedStart = false;
+			}
 	};
 
 	$scope.submit = function() {
-		if ($scope.email != '' && $scope.currentImage != '') {
+		if ($scope.email != '' && $scope.scripts.length > 0) {
 			$scope.hide = true;
 	    }
 	};

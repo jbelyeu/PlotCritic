@@ -2,7 +2,7 @@
 <html lang="en-US">
   <head>
     <meta charset="utf-8">
-    <title>NA12878</title>
+    <title>SVeee</title>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
 	<script src="https://sdk.amazonaws.com/js/aws-sdk-2.92.0.min.js"></script>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -13,7 +13,7 @@
 
 <body>
 
-	<div ng-app="svApp" ng-controller="svCtrl">	
+	<div ng-app="svApp" ng-controller="svCtrl">
  	<div class="emailInput" ng-hide="hide">
 		<form ng-submit="submit()"">
 		  Enter email:
@@ -22,14 +22,20 @@
 		</form>
 		<p class='disclaimer'>Your email address will not be used to send unsolicited messages.</p>
 	</div>
+
+
+
 	<div class="userEmail" ng-show="hide">
 		<p>{{email}}</p>
 	</div>
 	<div ng-show="hide" class=main_frame>
+
+
 		<div class="instructions"><p>Click buttons at bottom or use 'g', 'u', and 'b' keys to evaluate variant quality</p></div>
 		<div keypress-events ></div>
 		<div class="viewer" >
-		    <img ng-class="variantImgSelected" class='variantImg' ng-src="{{currentImage}}">
+
+		<div ng-class="variantImgSelected" class='variantImg' set-img-scripts scripts="scripts"></div>
 		    <div class="button_box">
 			    <button type="button" class="score_button" ng-class="goodButton" ng-click=goodVariant()>Good</button>
 			    <button type="button" class="score_button" ng-class="unclearButton" ng-click=unclearVariant()>Unknown</button>
