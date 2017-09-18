@@ -27,8 +27,7 @@ app.directive("setImgScripts", function() {
         return function (scripts) {
             element.empty();
             angular.forEach(scripts, function (script) {
-            	
-                var scriptTag = angular.element(document.createElement("script"));
+            	var scriptTag = angular.element(document.createElement("script"));
                 scriptTag[0]['src'] = script['src'];
                 scriptTag[0]['id'] = script['id'];
                 scriptTag[0]['data-bokeh-model-id'] = script['data-bokeh-model-id'];
@@ -97,7 +96,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http) {
 		    Item:{
 		    	'identifier': $scope.email + "_" + now,
 		        "email": $scope.email,
-		        'image': $scope.images[$scope.currentImageIdx]['script']['src'],
+		        'image': $scope.images[$scope.currentImageIdx]['inc_info']['src'],
 		        'bucket': __env.config.AWSBucketURl,
 		        'timestamp': now,
 		        'project' : __env.config.projectName,
@@ -148,7 +147,8 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http) {
 
 	var resetCurrent = function (change) {
 		$scope.currentImageIdx += change;
-		$scope.scripts = [$scope.images[$scope.currentImageIdx]['script']];
+		console.log($scope.images);
+		$scope.scripts = [$scope.images[$scope.currentImageIdx]['inc_info']];
 
 	};
 
