@@ -99,12 +99,20 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http) {
 
 		var docClient = new AWS.DynamoDB.DocumentClient();
 		var now = Date.now();
+
+		var imageID = "";
+		if (typeof $scope.images[$scope.currentImageIdx]['inc_info'] === "string") {
+			imageID = $scope.images[$scope.currentImageIdx]['inc_info'];
+		}
+		else {
+			imageID = $scope.images[$scope.currentImageIdx]['inc_info']['src'];
+		}
 		var params = {
 		    TableName:__env.config.dynamoScoresTable,
 		    Item:{
 		    	'identifier': $scope.email + "_" + now,
 		        "email": $scope.email,
-		        'image': $scope.images[$scope.currentImageIdx]['inc_info']['src'],
+		        'image': imageID,
 		        'bucket': __env.config.AWSBucketURl,
 		        'timestamp': now,
 		        'project' : __env.config.projectName,
