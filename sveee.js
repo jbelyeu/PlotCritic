@@ -27,13 +27,21 @@ app.directive("setImgScripts", function() {
         return function (scripts) {
             element.empty();
             angular.forEach(scripts, function (script) {
-            	var scriptTag = angular.element(document.createElement("script"));
-                scriptTag[0]['src'] = script['src'];
-                scriptTag[0]['id'] = script['id'];
-                scriptTag[0]['data-bokeh-model-id'] = script['data-bokeh-model-id'];
-                scriptTag[0]['data-bokeh-doc-id'] = script['data-bokeh-doc-id'];
-
-                element.append(scriptTag);
+            	if (typeof script === 'string') {
+            		var scriptTag = angular.element(document.createElement("img"));
+	                scriptTag[0]['src'] = script;
+	                scriptTag.addClass("variantImgInside");
+	                element.removeClass("variantImg");
+            	}
+            	else {
+	            	var scriptTag = angular.element(document.createElement("script"));
+	                scriptTag[0]['src'] = script['src'];
+	                scriptTag[0]['id'] = script['id'];
+	                scriptTag[0]['data-bokeh-model-id'] = script['data-bokeh-model-id'];
+	                scriptTag[0]['data-bokeh-doc-id'] = script['data-bokeh-doc-id'];
+	                element.addClass("variantImg");
+				}
+	            element.append(scriptTag);	
             });
         };
     };
@@ -147,7 +155,6 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http) {
 
 	var resetCurrent = function (change) {
 		$scope.currentImageIdx += change;
-		console.log($scope.images);
 		$scope.scripts = [$scope.images[$scope.currentImageIdx]['inc_info']];
 
 	};
