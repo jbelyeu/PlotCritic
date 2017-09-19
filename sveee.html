@@ -2,7 +2,7 @@
 <html lang="en-US">
   <head>
     <meta charset="utf-8">
-    <title>NA12878</title>
+    <title>SVeee</title>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
 	<script src="https://sdk.amazonaws.com/js/aws-sdk-2.92.0.min.js"></script>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -13,45 +13,48 @@
 
 <body>
 
-	<div ng-app="svApp" ng-controller="svCtrl">	
- 	<div class="emailInput" ng-hide="hide">
-		<form ng-submit="submit()"">
-		  Enter email:
-		  <input type="email" ng-model="email" name="text" />
-		  <input type="submit" id="submit" value="Submit"/>
-		</form>
-		<p class='disclaimer'>Your email address will not be used to send unsolicited messages.</p>
-	</div>
-	<div class="userEmail" ng-show="hide">
-		<p>{{email}}</p>
-	</div>
-	<div ng-show="hide" class=main_frame>
-		<div class="instructions"><p>Click buttons at bottom or use 'g', 'u', and 'b' keys to evaluate variant quality</p></div>
-		<div keypress-events ></div>
-		<div class="viewer" >
-		    <img ng-class="variantImgSelected" class='variantImg' ng-src="{{currentImage}}">
-		    <div class="button_box">
-			    <button type="button" class="score_button" ng-class="goodButton" ng-click=goodVariant()>Good</button>
-			    <button type="button" class="score_button" ng-class="unclearButton" ng-click=unclearVariant()>Unknown</button>
-				<button type="button" class="score_button" ng-class="badButton" ng-click=badVariant()>Bad</button>
-			</div>
+	<div ng-app="svApp" ng-controller="svCtrl">
+	 	<div class="emailInput" ng-hide="hide">
+			<form ng-submit="submit()"">
+			  Enter email:
+			  <input type="email" ng-model="email" name="text" />
+			  <input type="submit" id="submit" value="Submit"/>
+			</form>
+			<p class='disclaimer'>Your email address will not be used to send unsolicited messages.</p>
 		</div>
+		
+		<div class="userEmail" ng-show="hide">
+			<p>{{email}}</p>
+		</div>
+		<div ng-show="hide" class=main_frame>
+			<button class="logout_button" ng-click=reload()>Log out</button>
+			<div class="instructions"><p>Click buttons at bottom or use 'g', 'u', and 'b' keys to evaluate variant quality</p></div>
+			<div keypress-events ></div>
+			<div class="viewer" >
 
-	    <div class="endMsg" ng-show="reachedEnd"><p>You have reached the end of the available variants</p>
-	    </div>
-	    <div class="endMsg" ng-show="reachedStart"><p>You have reached the beginning of the available variants</p>
-	    </div>
-	    <div class="button_box nav_box">
-		    <div class="left_button_box">
-		    	<button class="nav_button" ng-click=beginning()>&laquo; Start</button>
-			    <button class="start nav_button" ng-click=previous()>&#8249; Previous</button>
+			<div set-img-scripts scripts="scripts"></div>
+			    <div class="button_box" ng-class="variantImgSelected">
+				    <button type="button" class="score_button" ng-class="goodButton" ng-click=goodVariant()>Good</button>
+				    <button type="button" class="score_button" ng-class="unclearButton" ng-click=unclearVariant()>Unknown</button>
+					<button type="button" class="score_button" ng-class="badButton" ng-click=badVariant()>Bad</button>
+				</div>
 			</div>
-		    <div class="right_button_box">
-				<button class="next nav_button" ng-click=next()>Next &#8250;</button>
-				<button class="end nav_button" ng-click=ending()>End &raquo;</button>
+
+		    <div class="endMsg" ng-show="reachedEnd"><p>You have reached the end of the available variants</p>
+		    </div>
+		    <div class="endMsg" ng-show="reachedStart"><p>You are at the beginning of the available variants</p>
+		    </div>
+		    <div class="button_box nav_box">
+			    <div class="left_button_box">
+			    	<button class="nav_button" ng-click=beginning()>&laquo; Start</button>
+				    <button class="start nav_button" ng-click=previous()>&#8249; Previous</button>
+				</div>		
+			    <div class="right_button_box">
+					<button class="next nav_button" ng-click=next()>Next &#8250;</button>
+					<button class="end nav_button" ng-click=ending()>End &raquo;</button>
+				</div>
 			</div>
 		</div>
-	</div>
 	</div>
 	<script src="sveee.js"></script>
 </body>

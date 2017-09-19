@@ -67,6 +67,11 @@ a:hover {
 .unclear_button_dark {
     background-color: #585555;
 }
+.logout_button {
+    margin-top: 2px;
+    margin-left: 5px;
+    padding-bottom: 2px;
+}
 .endMsg {
     text-align: center;
     font-size: 1.5em;
@@ -81,7 +86,6 @@ a:hover {
 
 .viewer {
     width: fit-content;
-    /*border: 2px solid black;*/
     padding: 10px;
 
     width:810vw;
@@ -98,6 +102,12 @@ a:hover {
     border: 5px solid #008CBA !important;
 }
 
+.variantImgInside{
+    border: 2px solid black;
+    max-height: 50%;
+    max-width: 50%;
+}
+
 .button_box {
     width: 50%;
     padding: 10px;
@@ -105,10 +115,9 @@ a:hover {
 }
 
 .variantImg {
-    max-width:100%;
-    height:auto;
-    max-height:100%;
+    width: fit-content;
     border: 2px solid black;
+    margin: 0 auto;
 }
 
 .userEmail {
