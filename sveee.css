@@ -67,6 +67,11 @@ a:hover {
 .unclear_button_dark {
     background-color: #585555;
 }
+.logout_button {
+    margin-top: 2px;
+    margin-left: 5px;
+    padding-bottom: 2px;
+}
 .endMsg {
     text-align: center;
     font-size: 1.5em;

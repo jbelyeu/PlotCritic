@@ -58,7 +58,7 @@ app.directive("setImgScripts", function() {
     };
 });
 
-app.controller("svCtrl", function($scope, $rootScope, $timeout, $http) {
+app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) {
 
 	$scope.scripts = [];
 	$scope.images = [];
@@ -242,6 +242,10 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http) {
 			if ($scope.currentImageIdx !== 0) {
 				$scope.reachedStart = false;
 			}
+	};
+
+	$scope.reload = function () {
+			$window.location.reload();
 	};
 
 	$scope.submit = function() {
