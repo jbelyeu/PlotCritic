@@ -22,7 +22,6 @@ function ($document, $rootScope) {
 });
 
 app.directive("setImgScripts", function() {
- 
     var updateScripts = function (element) {
         return function (scripts) {
             element.empty();
@@ -40,7 +39,6 @@ app.directive("setImgScripts", function() {
 	                scriptTag[0]['data-bokeh-model-id'] = script['data-bokeh-model-id'];
 	                scriptTag[0]['data-bokeh-doc-id'] = script['data-bokeh-doc-id'];
 	                element.addClass("variantImg");
-
 				}
 	            element.append(scriptTag);	
             });
@@ -72,6 +70,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	$scope.email = '';
 	$scope.hide = false;
 	$scope.html_url = "";
+	$scope.load_time
 
 
     $rootScope.$on('keypress', function (evt, obj, key) {
@@ -115,7 +114,8 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 		        "email": $scope.email,
 		        'image': imageID,
 		        'bucket': __env.config.AWSBucketURl,
-		        'timestamp': now,
+		        'response_time': now,
+		        'load_time': $scope.load_time,
 		        'project' : __env.config.projectName,
 		        'score': flag
 		    }
@@ -165,7 +165,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	var resetCurrent = function (change) {
 		$scope.currentImageIdx += change;
 		$scope.scripts = [$scope.images[$scope.currentImageIdx]['inc_info']];
-
+		$scope.load_time = Date.now();
 	};
 
 	//scope functions
@@ -178,7 +178,6 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 			$scope.variantImgSelected = "";
 			$scope.next();
 		}, 100);
-		
 	};
 
 	$scope.unclearVariant = function () {

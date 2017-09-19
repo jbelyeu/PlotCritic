@@ -31,6 +31,7 @@
 			<div class="instructions"><p>Click buttons at bottom or use 'g', 'u', and 'b' keys to evaluate variant quality</p></div>
 			<div keypress-events ></div>
 			<div class="viewer" >
+				<p>{{currentImageIdx+1}}/{{images.length}} ({{(((currentImageIdx)/images.length)*100).toFixed(1)}}%)</p>
 
 			<div set-img-scripts scripts="scripts"></div>
 			    <div class="button_box" ng-class="variantImgSelected">
