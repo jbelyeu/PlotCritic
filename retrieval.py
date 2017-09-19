@@ -16,6 +16,10 @@ parser.add_argument('-f', "--filters",
         required=False, 
         type=key_val, 
         nargs="+")
+parser.add_argument('-v', "--verbose", 
+        help="Run verbosely. If not specified, entries missing fields will be omitted",
+        required=False,
+        action="store_true")
 args = parser.parse_args()
 
 with open("config.json",'r') as config_file:
@@ -32,7 +36,7 @@ try:
 except ClientError as e:
     print (e.response['Error']['Message'])
 else:
-    header_fields = ["BUCKET","EMAIL","IMAGE", "SCORE", "TIMESTAMP", "PROJECT", "IDENTIFIER"]
+    header_fields = ["BUCKET","EMAIL","IMAGE", "SCORE", "LOADTIME", "RESPONSETIME", "PROJECT", "IDENTIFIER"]
     print ("#" + "\t".join(header_fields))
 
     for entry in response['Items']:
@@ -44,6 +48,8 @@ else:
                     continue
         if not skip:
             try:
-                print ("\t".join([entry['bucket'],entry['email'],entry['image'],str(entry['score']),str(entry['timestamp']), entry['project'], entry['identifier']]))
+                print ("\t".join([entry['bucket'],entry['email'],entry['image'],str(entry['score']),
+                    str(entry['load_time']), str(entry['response_time']), entry['project'], entry['identifier']]))
             except:
-                print("Error printing entry: " + str(entry), file=sys.stderr)
+                if args.verbose:
+                    print("Error printing entry: " + str(entry), file=sys.stderr)
