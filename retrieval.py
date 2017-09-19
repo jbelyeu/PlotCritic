@@ -12,7 +12,7 @@ def key_val(arg):
 parser = argparse.ArgumentParser(
         description="Tool for retrieving entries from the SVeee DynamoDB tables")
 parser.add_argument('-f', "--filters", 
-        help="key-values pairs of filters for entries to report",
+        help="comma-separated key,values pairs of filters for entries to report (i.e: 'key1','value1' 'key2','value2'",
         required=False, 
         type=key_val, 
         nargs="+")
