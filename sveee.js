@@ -207,7 +207,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http) {
 		$scope.reachedEnd = false;
 		$scope.reachedStart = false;
 
-		if ($scope.currentImageIdx -1 > 0) {
+		if ($scope.currentImageIdx -1 >= 0) {
 			resetCurrent(-1);
 		}
 		else {
