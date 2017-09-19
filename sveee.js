@@ -40,6 +40,7 @@ app.directive("setImgScripts", function() {
 	                scriptTag[0]['data-bokeh-model-id'] = script['data-bokeh-model-id'];
 	                scriptTag[0]['data-bokeh-doc-id'] = script['data-bokeh-doc-id'];
 	                element.addClass("variantImg");
+
 				}
 	            element.append(scriptTag);	
             });
@@ -171,12 +172,13 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http) {
 	$scope.goodVariant = function () {
 		$scope.goodButton.push("good_button_dark");
 		$scope.variantImgSelected = "variantImgGood";
-		sendScore(true);
+		sendScore(true); 
 		$timeout(function() { 
 			$scope.goodButton.pop();
 			$scope.variantImgSelected = "";
-		}, 50);
-		$scope.next();
+			$scope.next();
+		}, 100);
+		
 	};
 
 	$scope.unclearVariant = function () {
@@ -186,8 +188,8 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http) {
 		$timeout(function() { 
 			$scope.unclearButton.pop();
 			$scope.variantImgSelected = "";
-		}, 50);
-		$scope.next();
+			$scope.next();
+		}, 100);
 	};
 
 	$scope.badVariant = function () {
@@ -197,8 +199,8 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http) {
 		$timeout(function() { 
 			$scope.badButton.pop();
 			$scope.variantImgSelected = "";
-		}, 50);
-		$scope.next();
+			$scope.next();
+		}, 100);
 	};
 
 	$scope.previous = function () {
