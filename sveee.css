@@ -8,7 +8,9 @@ a:hover {
     background-color: #ddd;
     color: black;
 }
-
+.hidden {
+    display: none;
+}
 .end {
     float:right;
     display:block;

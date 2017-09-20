@@ -21,41 +21,6 @@ function ($document, $rootScope) {
     }
 });
 
-app.directive("setImgScripts", function() {
-    var updateScripts = function (element) {
-        return function (scripts) {
-            element.empty();
-            angular.forEach(scripts, function (script) {
-            	if (typeof script === 'string') {
-            		var scriptTag = angular.element(document.createElement("img"));
-	                scriptTag[0]['src'] = script;
-	                scriptTag.addClass("variantImgInside");
-	                element.removeClass("variantImg");
-            	}
-            	else {
-	            	var scriptTag = angular.element(document.createElement("script"));
-	                scriptTag[0]['src'] = script['src'];
-	                scriptTag[0]['id'] = script['id'];
-	                scriptTag[0]['data-bokeh-model-id'] = script['data-bokeh-model-id'];
-	                scriptTag[0]['data-bokeh-doc-id'] = script['data-bokeh-doc-id'];
-	                element.addClass("variantImg");
-				}
-	            element.append(scriptTag);	
-            });
-        };
-    };
- 
-    return {
-        restrict: "EA",
-        scope: {
-          scripts: "=" 
-        },
-        link: function(scope,element) {
-            scope.$watch("scripts", updateScripts(element));
-        }
-    };
-});
-
 app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) {
 
 	$scope.scripts = [];
@@ -70,7 +35,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	$scope.email = '';
 	$scope.hide = false;
 	$scope.html_url = "";
-	$scope.load_time
+	$scope.load_time;
 
 
     $rootScope.$on('keypress', function (evt, obj, key) {
@@ -127,17 +92,14 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 		});
 	};
 
-	var init = function () {
-
+	var init = function (see_again) {
 		AWS.config.update({
 			accessKeyId: __env.config.accessKey, 
 			secretAccessKey: __env.config.secretAccessKey,
 			endpoint: "https://dynamodb." + __env.config.dynamoRegion + ".amazonaws.com",
 			region: __env.config.dynamoRegion
 		});
-
 		var docClient = new AWS.DynamoDB.DocumentClient();
-
 		var params = {
   			TableName: __env.config.dynamoImagesTable
 		};
@@ -146,8 +108,50 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 		        console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
 		    }
 		    else {
-		    	$scope.images = shuffleArray(data['Items']);
-		    	resetCurrent(0);
+	    		var subdocClient = new AWS.DynamoDB.DocumentClient();
+				var prev_params = {
+					TableName: __env.config.dynamoScoresTable,
+					ProjectionExpression: "image",
+				    FilterExpression: "#proj = :curr_proj and email = :curr_user",
+				    ExpressionAttributeNames: {
+				        "#proj": "project",
+				    },
+				    ExpressionAttributeValues: {
+				        ":curr_proj" : __env.config.projectName,
+				        ":curr_user" : $scope.email
+				    }
+				};
+
+				var previously_done_data;
+				subdocClient.scan(prev_params, function(err, prev_data) {
+				    if (err) {
+				        console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
+				    }
+				    else {
+				    	var items_to_use = [];
+			    		for (var i = 0; i < data.Items.length; ++i) {
+			    			var item = data.Items[i];
+			    			img_url = item['inc_info'];
+			    			if (typeof item['inc_info'] !== 'string') {
+			    				img_url = item['inc_info']['src'];
+			    			}
+
+			    			var found_in_prev = false;
+			    			prev_data.Items.forEach( function( prev_item) {
+			    				if (prev_item['image'] == img_url) {
+			    					found_in_prev = true;
+			    				}
+			    			});
+			    			if (see_again && found_in_prev) {
+			    				items_to_use.push(data.Items[i]);
+			    			}
+			    			else if (!see_again && !found_in_prev) {
+			    				items_to_use.push(data.Items[i]);	
+			    			}
+			    		}			    		
+				    	shuffleArray(items_to_use);
+				    }
+				});
 		    }
 		});
 	};
@@ -159,13 +163,55 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	        arr[i] = arr[j];
 	        arr[j] = temp;
 	    }
-	    return arr;
+	    $scope.images = arr;
+
+	    resetCurrent(0);
+    	if ($scope.scripts.length > 0) {
+			$scope.hide = true;
+
+			element = angular.element( document.querySelector( '#allScored' ) );
+			element.addClass('hidden');
+		}
+		else {
+			element = angular.element( document.querySelector( '#allScored' ) );
+			element.removeClass('hidden');
+		}		
 	};
 
+	var updateScripts = function (callback) {
+		element = angular.element( document.querySelector( '#mycontainer' ) );
+        element.empty();
+        angular.forEach($scope.scripts, function (script) {
+        	if (typeof script === 'string') {
+        		var scriptTag = angular.element(document.createElement("img"));
+                scriptTag[0]['src'] = script;
+                scriptTag.addClass("variantImgInside");
+                element.removeClass("variantImg");
+        	}
+        	else {
+            	var scriptTag = angular.element(document.createElement("script"));
+                scriptTag[0]['src'] = script['src'];
+                scriptTag[0]['id'] = script['id'];
+                scriptTag[0]['data-bokeh-model-id'] = script['data-bokeh-model-id'];
+                scriptTag[0]['data-bokeh-doc-id'] = script['data-bokeh-doc-id'];
+                element.addClass("variantImg");
+			}
+            element.append(scriptTag);            
+        });	
+    };
+
 	var resetCurrent = function (change) {
-		$scope.currentImageIdx += change;
-		$scope.scripts = [$scope.images[$scope.currentImageIdx]['inc_info']];
-		$scope.load_time = Date.now();
+		if ($scope.images.length > 0) {
+			$scope.currentImageIdx += change;
+			$scope.scripts = [$scope.images[$scope.currentImageIdx]['inc_info']];
+			updateScripts();
+
+			// This is not a good fix...but it works and I'm sick of things not working
+			$timeout(function() { 
+				$scope.hide = true;
+				$scope.load_time = Date.now();
+			}, 100);	
+		}
 	};
 
 	//scope functions
@@ -243,14 +289,17 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 			}
 	};
 
+	$scope.see_images_again = function() {
+		init(true);
+	}
+
 	$scope.reload = function () {
-			$window.location.reload();
+		$window.location.reload();
 	};
 
 	$scope.submit = function() {
-		if ($scope.email != '' && $scope.scripts.length > 0) {
-			$scope.hide = true;
-	    }
+		if ($scope.email != '') {
+			init(false);
+		}
 	};
-	init();
 });

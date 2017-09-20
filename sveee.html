@@ -21,11 +21,18 @@
 			  <input type="submit" id="submit" value="Submit"/>
 			</form>
 			<p class='disclaimer'>Your email address will not be used to send unsolicited messages.</p>
+			<div id="allScored" class="hidden">
+				<p>You have already scored all variants for this project.</p>
+				<p>Click below to see variants you already scored again.</p>
+				<button class="nav_button" ng-click=see_images_again()>Continue &raquo;</button>
+			</div>
 		</div>
+		
 		
 		<div class="userEmail" ng-show="hide">
 			<p>{{email}}</p>
 		</div>
+		
 		<div ng-show="hide" class=main_frame>
 			<button class="logout_button" ng-click=reload()>Log out</button>
 			<div class="instructions"><p>Click buttons at bottom or use 'g', 'u', and 'b' keys to evaluate variant quality</p></div>
@@ -33,7 +40,7 @@
 			<div class="viewer" >
 				<p>{{currentImageIdx+1}}/{{images.length}} ({{(((currentImageIdx)/images.length)*100).toFixed(1)}}%)</p>
 
-			<div set-img-scripts scripts="scripts"></div>
+			<div id="mycontainer" set-img-scripts scripts="scripts"></div>
 			    <div class="button_box" ng-class="variantImgSelected">
 				    <button type="button" class="score_button" ng-class="goodButton" ng-click=goodVariant()>Good</button>
 				    <button type="button" class="score_button" ng-class="unclearButton" ng-click=unclearVariant()>Unknown</button>
