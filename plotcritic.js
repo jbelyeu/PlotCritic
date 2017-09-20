@@ -36,6 +36,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	$scope.hide = false;
 	$scope.html_url = "";
 	$scope.load_time;
+	$scope.project = __env.config.projectName;
 
 
     $rootScope.$on('keypress', function (evt, obj, key) {
