@@ -82,7 +82,10 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 		        'response_time': now,
 		        'load_time': $scope.load_time,
 		        'project' : __env.config.projectName,
-		        'score': flag
+		        'score': flag,
+		        'chrom': $scope.images[$scope.currentImageIdx]['chr'],
+		        'start': $scope.images[$scope.currentImageIdx]['start'],
+		        'end': $scope.images[$scope.currentImageIdx]['end']
 		    }
 		};
 		docClient.put(params, function(err, data) {
@@ -105,7 +108,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 		};
 		docClient.scan(params, function(err, data) {
 		    if (err) {
-		        console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
+		        console.error("Unable to retrieve item. Error JSON:", JSON.stringify(err, null, 2));
 		    }
 		    else {
 	    		var subdocClient = new AWS.DynamoDB.DocumentClient();
@@ -125,7 +128,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 				var previously_done_data;
 				subdocClient.scan(prev_params, function(err, prev_data) {
 				    if (err) {
-				        console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
+				        console.error("Unable to retrieve item. Error JSON:", JSON.stringify(err, null, 2));
 				    }
 				    else {
 				    	var items_to_use = [];
