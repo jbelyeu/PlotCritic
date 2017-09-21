@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head >
+    <meta charset="utf-8">
+    <title >PlotCritic</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+	<script src="https://rawgit.com/aws/amazon-cognito-identity-js/master/dist/aws-cognito-sdk.min.js" > </script>
+	<script src="https://rawgit.com/aws/amazon-cognito-identity-js/master/dist/amazon-cognito-identity.min.js"> </script>
+	<script src="https://sdk.amazonaws.com/js/aws-sdk-2.92.0.min.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<link rel="stylesheet" href="../style/plotcritic.css">
+	<script src="../js/env.js"></script>
+  </head>
+
+<body>
+
+	<div ng-app="svApp" ng-controller="svCtrl">
+	 	<div class="emailInput" ng-hide="hide">
+			<form ng-submit="submit()"">
+			  Enter email:
+			  <input type="email" ng-model="email" name="text" />
+			  <input type="submit" id="submit" value="Submit"/>
+			</form>
+			<p class='disclaimer'>Your email address will not be used to send unsolicited messages.</p>
+			<div id="allScored" class="hidden">
+				<p>You have already scored all variants for this project.</p>
+				<p>Click below to see variants you already scored again.</p>
+				<button class="nav_button" ng-click=see_images_again()>Continue &raquo;</button>
+			</div>
+		</div>
+		
+		
+		<div class="userEmail" ng-show="hide">
+			<p>{{email}}</p>
+		</div>
+		
+		<div ng-show="hide" class=main_frame>
+			
+		</div>
+	</div>
+	<script src="../js/signup.js"></script>
+</body>
+</html
