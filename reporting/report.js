@@ -12,7 +12,7 @@ app.constant('__env', env);
 app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) {
 
 	$scope.records = [];
-	$scope.header = ["Project", "Chrom", "Start", "End", "Good", "Bad", "Unclear", "Total Scores"];
+	$scope.header = ["Project", "Chrom", "Start", "End", "Good", "Bad", "Denovo", "Total_Scores"];
 	$scope.email = '';
 	$scope.hide = false;
 	$scope.orderByField = 'Project';
@@ -51,20 +51,24 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 		    	summary_data = {};
 		    	data.Items.forEach(function (score_item) {
 		    		var img_url = score_item['image'];
-		    		score_item['chrom'] = score_item['chrom'].replace("chr", "");
+		    		var chrom = score_item['chrom'].replace("chr", "");
+                                if (! (isNaN(parseInt(chrom)))) {
+                                    chrom = parseInt(chrom);
+                                }
+
 		    		if (! (img_url in summary_data)) {
 		    			summary_data[img_url] = {
 			    			'Project' 		: score_item['project'],
-			    			'Chrom' 		: parseInt(score_item['chrom']),
+			    			'Chrom' 		: chrom,
 			    			'Start' 		: parseInt(score_item['start']),
 			    			'End'			: parseInt(score_item['end']),
 			    			'Good' 			: 0,
 			    			'Bad' 			: 0,
-			    			'Unclear' 		: 0,
-			    			'Total Scores' 	: 0
+			    			'Denovo' 		: 0,
+			    			'Total_Scores' 	: 0
 			    		};
 		    		}
-		    		summary_data[img_url]['Total Scores'] += 1;
+		    		summary_data[img_url]['Total_Scores'] += 1;
 		    		if (score_item['score'] === true) {
 		    			summary_data[img_url]['Good'] += 1;
 		    		}
@@ -72,7 +76,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 		    			summary_data[img_url]['Bad'] += 1;
 		    		}
 		    		else {
-		    			summary_data[img_url]['Unclear'] += 1;
+		    			summary_data[img_url]['Denovo'] += 1;
 		    		}
 		    	});
 		    	$scope.records = Object.values(summary_data);

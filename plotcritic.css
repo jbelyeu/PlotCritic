@@ -60,6 +60,9 @@ a:hover {
     background-color: #ba004c;
     /*margin-left: 1%;*/
 }
+.denovo_button {
+    background-color: green;
+}
 .bad_button_dark {
     background-color: #79304a;
 }
@@ -87,11 +90,8 @@ a:hover {
 }
 
 .viewer {
-    width: fit-content;
-    padding: 10px;
-
     width:810vw;
-    height:80vh;
+    height:50vh;
     display:table-cell;
     vertical-align:middle;
     text-align:center;
@@ -106,8 +106,9 @@ a:hover {
 
 .variantImgInside{
     border: 2px solid black;
-    max-height: 50%;
-    max-width: 50%;
+    width: -webkit-fill-available;
+    max-height: 80%;
+    max-width: 1200px;
 }
 
 .button_box {

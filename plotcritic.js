@@ -28,7 +28,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	$scope.currentImageIdx = 0;
 	$scope.goodButton = ["good_button"];
 	$scope.badButton = ["bad_button"];
-	$scope.unclearButton = ["unclear_button"];
+	$scope.denovoButton = ["denovo_button"];
 	$scope.variantImgSelected = '';	
 	$scope.reachedEnd = false;
 	$scope.reachedStart = false;
@@ -48,8 +48,8 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	            else if (key == 'b' || key == 'B') {
 	            	$scope.badVariant();
 	            }
-	            else if (key == 'u' || key == 'U') {
-	            	$scope.unclearVariant();
+	            else if (key == 'd' || key == 'D') {
+	            	$scope.denovoVariant();
 	            }
         	}            
         });
@@ -230,12 +230,12 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 		}, 100);
 	};
 
-	$scope.unclearVariant = function () {
-		$scope.unclearButton.push("unclear_button_dark");
+	$scope.denovoVariant = function () {
+		$scope.denovoButton.push("denovo_button_dark");
 		$scope.variantImgSelected = "variantImgUnclear";
-		sendScore('unclear');
+		sendScore('denovo');
 		$timeout(function() { 
-			$scope.unclearButton.pop();
+			$scope.denovoButton.pop();
 			$scope.variantImgSelected = "";
 			$scope.next();
 		}, 100);

@@ -39,7 +39,7 @@
 			        	</a>
 			        </th>
 			        <th>
-			        	<a href="#" ng-click="orderByField=header[2]; reverseSort = !reverseSort">{{ header[2] }}<span ng-show="orderByField == header[2]"><span ng-show="!reverseSort"> ^ </span><span ng-show="reverseSort"> v </span></span>
+			        	<a href="#" ng-click="orderByField=header[2]; reverseSort = !reverseSort">{{ (header[2]).replace("_", " ") }}<span ng-show="orderByField == header[2]"><span ng-show="!reverseSort"> ^ </span><span ng-show="reverseSort"> v </span></span>
 			        	</a>
 			        </th>
 			        <th>
@@ -59,7 +59,7 @@
 			        	</a>
 			        </th>
 			        <th>
-			        	<a href="#" ng-click="orderByField=header[7]; reverseSort = !reverseSort">{{ header[7] }}<span ng-show="orderByField == header[7]"><span ng-show="!reverseSort"> ^ </span><span ng-show="reverseSort"> v </span></span>
+			        	<a href="#" ng-click="orderByField=header[7]; reverseSort = !reverseSort">{{ (header[7]).replace("_", " ") }}<span ng-show="orderByField == header[7]"><span ng-show="!reverseSort"> ^ </span><span ng-show="reverseSort"> v </span></span>
 			        	</a>
 			        </th>
 
@@ -69,10 +69,10 @@
 					    <td>{{ record['Chrom'] }}</td>
 					    <td>{{ record['Start'] }}</td>
 					    <td>{{ record['End'] }}</td>
-					    <td>{{ ((record['Good'] / record['Total Scores']) * 100).toFixed(1) }}%</td>
-					    <td>{{ ((record['Bad'] / record['Total Scores']) * 100).toFixed(1) }}%</td>
-					    <td>{{ ((record['Unclear'] / record['Total Scores']) * 100).toFixed(1) }}%</td>
-					    <td>{{ record['Total Scores'] }}</td>
+					    <td>{{ ((record['Good'] / record['Total_Scores']) * 100).toFixed(1) }}%</td>
+					    <td>{{ ((record['Bad'] / record['Total_Scores']) * 100).toFixed(1) }}%</td>
+					    <td>{{ ((record['Denovo'] / record['Total_Scores']) * 100).toFixed(1) }}%</td>
+					    <td>{{ record['Total_Scores'] }}</td>
 				  </tr>
 				</table>
 

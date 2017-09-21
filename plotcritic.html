@@ -35,15 +35,15 @@
 		
 		<div ng-show="hide" class=main_frame>
 			<button class="logout_button" ng-click=reload()>Log out</button>
-			<div class="instructions"><p>Click buttons at bottom or use 'g', 'u', and 'b' keys to evaluate variant quality</p></div>
+			<div class="instructions"><p>Click buttons at bottom or use 'g', 'd', and 'b' keys to evaluate variant quality</p></div>
 			<div keypress-events ></div>
 			<div class="viewer" >
-				<p>{{currentImageIdx+1}}/{{images.length}} ({{(((currentImageIdx)/images.length)*100).toFixed(1)}}%)</p>
+				<p>{{currentImageIdx+1}}/{{images.length+1}} ({{(((currentImageIdx)/(images.length+1))*100).toFixed(1)}}%)</p>
 
 			<div id="mycontainer" set-img-scripts scripts="scripts"></div>
 			    <div class="button_box" ng-class="variantImgSelected">
 				    <button type="button" class="score_button" ng-class="goodButton" ng-click=goodVariant()>Good</button>
-				    <button type="button" class="score_button" ng-class="unclearButton" ng-click=unclearVariant()>Unknown</button>
+				    <button type="button" class="score_button denovo_button" ng-class="denovoButton" ng-click=denovoVariant()>De Novo</button>
 					<button type="button" class="score_button" ng-class="badButton" ng-click=badVariant()>Bad</button>
 				</div>
 			</div>
