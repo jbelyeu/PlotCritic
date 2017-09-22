@@ -4,7 +4,6 @@ import boto3
 from boto3.dynamodb.conditions import Key, Attr
 from botocore.exceptions import ClientError
 import json
-from pprint import pprint
 import argparse
 
 def key_val(arg):
@@ -31,15 +30,20 @@ dynamodb = boto3.resource('dynamodb',
     aws_secret_access_key=config_data['secretAccessKey']
 )
 sveee_table = dynamodb.Table(config_data['dynamoTable'])
+response_items = []
 try:
     response = sveee_table.scan()
+    response_items += response['Items']
+    while 'LastEvaluatedKey' in response:
+        response = sveee_table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
+        response_items.extend(response['Items'])
 except ClientError as e:
     print (e.response['Error']['Message'])
 else:
     header_fields = ["BUCKET","EMAIL","IMAGE", "SCORE", "LOADTIME", "RESPONSETIME", "PROJECT", "IDENTIFIER"]
     print ("#" + "\t".join(header_fields))
 
-    for entry in response['Items']:
+    for entry in response_items:
         skip = False
         if args.filters:
             for filt in args.filters:
