@@ -40,7 +40,7 @@
 			<div class="viewer" >
 				<p>Results for project `{{project}}`. Use script `retrieval.py` to download data.</p>
 				<table class="table table-bordered">
-					<tr>					
+					<tr>
 			        <th>
 			        	<a href="#" ng-click="orderByField=header[1]; reverseSort = !reverseSort">{{ header[1] }}<span ng-show="orderByField == header[1]"><span ng-show="!reverseSort"> ^ </span><span ng-show="reverseSort"> v </span></span>
 			        	</a>
@@ -76,9 +76,9 @@
 					    <td>{{ record['Chrom'] }}</td>
 					    <td>{{ record['Start'] }}</td>
 					    <td>{{ record['End'] }}</td>
-					    <td>{{ ((record['Good'] / record['Total_Scores']) * 100).toFixed(1) }}%</td>
-					    <td>{{ ((record['Bad'] / record['Total_Scores']) * 100).toFixed(1) }}%</td>
-					    <td>{{ ((record['Denovo'] / record['Total_Scores']) * 100).toFixed(1) }}%</td>
+					    <td>{{ record['Good'].toFixed(1) }}%</td>
+					    <td>{{ record['Bad'].toFixed(1) }}%</td>
+					    <td>{{ record['De_novo'].toFixed(1) }}%</td>
 					    <td>{{ record['Total_Scores'] }}</td>
 				  </tr>
 				</table>

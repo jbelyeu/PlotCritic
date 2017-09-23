@@ -37,15 +37,18 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
     	rawData.forEach(function (score_item) {
     		var img_url = score_item['image'];
     		score_item['chrom'] = score_item['chrom'].replace("chr", "");
+    		if (! isNaN(parseInt(score_item['chrom'])) ) {
+    			score_item['chrom'] = parseInt(score_item['chrom']);
+    		}
     		if (! (img_url in summary_data)) {
     			summary_data[img_url] = {
 	    			'Project' 		: score_item['project'],
-	    			'Chrom' 		: parseInt(score_item['chrom']),
+	    			'Chrom' 		: score_item['chrom'],
 	    			'Start' 		: parseInt(score_item['start']),
 	    			'End'			: parseInt(score_item['end']),
 	    			'Good' 			: 0,
 	    			'Bad' 			: 0,
-	    			'Denovo' 		: 0,
+	    			'De_novo' 		: 0,
 	    			'Total_Scores' 	: 0
 	    		};
     		}
@@ -57,9 +60,19 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
     			summary_data[img_url]['Bad'] += 1;
     		}
     		else {
-    			summary_data[img_url]['Denovo'] += 1;
+    			summary_data[img_url]['De_novo'] += 1;
     		}
     	});
+    	for (var img in summary_data) { 
+    		var good_count = summary_data[img]['Good'] *1.0;
+    		var bad_count = summary_data[img]['Bad'] *1.0;
+    		var denovo_count = summary_data[img]['De_novo'] *1.0;
+    		var total_count = summary_data[img]['Total_Scores'] *1.0;
+
+    		summary_data[img]['Good'] = ((good_count/total_count)*100.0);
+    		summary_data[img]['Bad'] = ((bad_count/total_count)*100.0);
+    		summary_data[img]['De_novo'] = ((denovo_count/total_count)*100.0);
+    	}
     	$scope.records = Object.values(summary_data);
     	$scope.$apply();
 	};
