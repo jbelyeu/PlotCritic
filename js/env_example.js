@@ -1,15 +1,15 @@
 (function (window) {
-  window.__env = window.__env || {};
+	window.__env = window.__env || {};
 
-  window.__env.config = {
-	  "accessKey": "",
-	  "secretAccessKey": "",
-	  "dynamoRegion" : "",
-	  "dynamoTable" : "",
-	  "region" : "",
-	  "AWSBucketName" : "",
-	  "projectName" : "",
-	  "AWSBucketURl" : "",
-	  "allowedImageTypes" : ["png", "jpg", "jpeg"]
+	window.__env.config = {
+		"dynamoRegion" : "",
+		"dynamoTable" : "",
+		"region" : "",
+		"AWSBucketName" : "",
+		"projectName" : "",
+		"AWSBucketURl" : "",
+		"userPoolId" : '',
+		"clientID" : '',
+		"identityPoolId" : ""
 	}
 }(this));

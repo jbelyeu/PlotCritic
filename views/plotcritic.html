@@ -15,31 +15,36 @@
 <body>
 
 	<div ng-app="svApp" ng-controller="svCtrl">
-	 	<div class="emailInput" ng-hide="hide">
-			<form ng-submit="submit()"">
-			  Enter email:
-			  <input type="email" ng-model="email" name="text" />
-			  <input type="submit" id="submit" value="Submit"/>
+		<div class="centeredInput" ng-hide="authenticated">
+			<form ng-submit="submit()">
+				<p class="infoTitle">Sign In: </p>
+				<label for="email" class="emailLabel">User email</label>
+			 	<input type="email" ng-model="email" name="email" required/>
+			 	<br>
+			 	<label for="pass">Password <span style="font-size: 10px;"> (or confirmation code)</span></label>
+			 	<input type="password" ng-model="password" name="pass" required/>
+			 	<br>
+			 	<input type="submit" id="submit" value="Submit"/>
 			</form>
 			<p class='disclaimer'>Your email address will not be used to send unsolicited messages.</p>
-			<div id="allScored" class="hidden">
-				<p>You have already scored all variants for this project.</p>
-				<p>Click below to see variants you already scored again.</p>
-				<button class="nav_button" ng-click=see_images_again()>Continue &raquo;</button>
-			</div>
 		</div>
+		<div id="allScored" class="hidden centeredInput" >
+			<p>You have already scored all variants for this project.</p>
+			<p>Click below to see variants you already scored again.</p>
+			<button class="nav_button" ng-click=seeImagesAgain()>Continue &raquo;</button>
+		</div>		
 		
-		
-		<div class="userEmail" ng-show="hide">
+		<div class="userEmail" ng-show="authenticated">
 			<p>{{email}}</p>
+			<p>Project: {{project}}</p>
 		</div>
 		
 		<div ng-show="hide" class=main_frame>
-			<button class="logout_button" ng-click=reload()>Log out</button>
+			<button class="logoutButton" ng-click=reload()>Log out</button>
 			<div class="instructions"><p>Click buttons at bottom or use 'g', 'u', and 'b' keys to evaluate variant quality</p></div>
 			<div keypress-events ></div>
 			<div class="viewer" >
-				<p>{{currentImageIdx+1}}/{{images.length}} ({{(((currentImageIdx)/images.length)*100).toFixed(1)}}%)</p>
+				<p>{{currentImageIdx+1}}/{{images.length}} ({{(((currentImageIdx+1)/images.length)*100).toFixed(1)}}%)</p>
 
 			<div id="mycontainer" set-img-scripts scripts="scripts"></div>
 			    <div class="button_box" ng-class="variantImgSelected">

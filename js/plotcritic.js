@@ -23,6 +23,8 @@ function ($document, $rootScope) {
 
 app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) {
 
+	$scope.email = 'jrbelyeu@gmail.com';
+	$scope.password = 'Password1!';
 	$scope.scripts = [];
 	$scope.images = [];
 	$scope.currentImageIdx = 0;
@@ -32,12 +34,22 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	$scope.variantImgSelected = '';	
 	$scope.reachedEnd = false;
 	$scope.reachedStart = false;
-	$scope.email = '';
 	$scope.hide = false;
 	$scope.html_url = "";
 	$scope.load_time;
 	$scope.project = __env.config.projectName;
-
+	$scope.authenticated = false;
+	AWSCognito.config.apiVersions = {
+		cognitoidentityserviceprovider: '2016-04-18'
+	};
+	AWSCognito.config.region = __env.config.region;
+	AWS.config.region = __env.config.region;
+	var userPoolId =  __env.config.userPoolId;
+	var clientID = __env.config.clientID;
+	var identityPoolId = __env.config.identityPoolId;
+	var authenticationResult;
+	var userPool;
+	var cognitoUser;
 
     $rootScope.$on('keypress', function (evt, obj, key) {
         $scope.$apply(function () {
@@ -96,68 +108,168 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 		});
 	};
 
-	var init = function (see_again) {
-		AWS.config.update({
-			accessKeyId: __env.config.accessKey, 
-			secretAccessKey: __env.config.secretAccessKey,
-			endpoint: "https://dynamodb." + __env.config.dynamoRegion + ".amazonaws.com",
-			region: __env.config.dynamoRegion
-		});
-		var docClient = new AWS.DynamoDB.DocumentClient();
-		var params = {
-  			TableName: __env.config.dynamoImagesTable
-		};
-		docClient.scan(params, function(err, data) {
-		    if (err) {
-		        console.error("Unable to retrieve item. Error JSON:", JSON.stringify(err, null, 2));
-		    }
-		    else {
-	    		var subdocClient = new AWS.DynamoDB.DocumentClient();
-				var prev_params = {
-					TableName: __env.config.dynamoScoresTable,
-					ProjectionExpression: "image",
-				    FilterExpression: "#proj = :curr_proj and email = :curr_user",
-				    ExpressionAttributeNames: {
-				        "#proj": "project",
-				    },
-				    ExpressionAttributeValues: {
-				        ":curr_proj" : __env.config.projectName,
-				        ":curr_user" : $scope.email
-				    }
-				};
-
-				var previously_done_data;
-				subdocClient.scan(prev_params, function(err, prev_data) {
-				    if (err) {
-				        console.error("Unable to retrieve item. Error JSON:", JSON.stringify(err, null, 2));
-				    }
-				    else {
-				    	var items_to_use = [];
-			    		for (var i = 0; i < data.Items.length; ++i) {
-			    			var item = data.Items[i];
-			    			img_url = item['inc_info'];
-			    			if (typeof item['inc_info'] !== 'string') {
-			    				img_url = item['inc_info']['src'];
-			    			}
-
-			    			var found_in_prev = false;
-			    			prev_data.Items.forEach( function( prev_item) {
-			    				if (prev_item['image'] == img_url) {
-			    					found_in_prev = true;
+	var filterImages = function(seeAgain) {
+		var scores = [];
+		var batchScan = function (params) {
+			AWS.config.update({
+				endpoint: "https://dynamodb." + __env.config.dynamoRegion + ".amazonaws.com",
+			});
+			var docClient = new AWS.DynamoDB.DocumentClient();
+			docClient.scan(params, function(err, data) {
+			    if (err) {
+			        console.error("Unable to retrieve item. Error JSON:", JSON.stringify(err, null, 2));
+			    }
+			    else {
+			    	if (data.Items.length) {
+			    		scores.push.apply(scores, data.Items);
+			    	}
+			    	if ("LastEvaluatedKey" in data) {
+			    		params['ExclusiveStartKey'] = data['LastEvaluatedKey'];
+			    		batchScan(params);
+			    	}
+			    	else {
+			    		var filteredImages = [];
+			    		$scope.images.forEach(function (imgItem) {
+			    			var seenBefore = false;
+			    			for (var i = 0; i<scores.length;++i) {
+			    				if (imgItem['inc_info'] === scores[i]['image']) {
+			    					seenBefore = true;
 			    				}
-			    			});
-			    			if (see_again && found_in_prev) {
-			    				items_to_use.push(data.Items[i]);
 			    			}
-			    			else if (!see_again && !found_in_prev) {
-			    				items_to_use.push(data.Items[i]);	
+			    			if (seenBefore && seeAgain) {
+			    				filteredImages.push(imgItem);
 			    			}
-			    		}			    		
-				    	shuffleArray(items_to_use);
+			    			else if (!seenBefore && !seeAgain) {
+			    				filteredImages.push(imgItem);
+			    			}
+			    		});
+			    		shuffleArray(filteredImages);
+			    	}
+			    }
+			});
+		};
+		var params = {
+  			TableName: __env.config.dynamoScoresTable,
+  			ProjectionExpression: "image",
+  			FilterExpression: "#proj = :curr_proj and email = :curr_user",
+		    ExpressionAttributeNames: {
+		        "#proj": "project",
+		    },
+		    ExpressionAttributeValues: {
+		        ":curr_proj" : __env.config.projectName,
+		        ":curr_user" : $scope.email
+		    }
+		};
+		batchScan(params)
+	};	
+
+	var loadImages = function (seeAgain) {
+		var batchScan = function (params) {
+			AWS.config.update({
+				endpoint: "https://dynamodb." + __env.config.dynamoRegion + ".amazonaws.com",
+			});
+			var docClient = new AWS.DynamoDB.DocumentClient();
+			docClient.scan(params, function(err, data) {
+			    if (err) {
+			        console.error("Unable to retrieve item. Error JSON:", JSON.stringify(err, null, 2));
+			    }
+			    else {
+			    	if (data.Items.length) {
+			    		$scope.images.push.apply($scope.images, data.Items);
+			    	}
+			    	if ("LastEvaluatedKey" in data) {
+			    		params['ExclusiveStartKey'] = data['LastEvaluatedKey'];
+			    		batchScan(params);
+			    	}
+			    	else {
+						filterImages(seeAgain);
+			    	}
+			    }
+			});
+		};
+		var params = {
+  			TableName: __env.config.dynamoImagesTable,
+		};
+		batchScan(params);
+	}
+
+	var init = function () {
+		// Sign user in (depends on pool object) and store token
+		//***************************************************************************
+		userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool({
+		    UserPoolId : userPoolId,
+		    ClientId : clientID 
+		});
+
+		var authenticationData = {
+	        Username : $scope.email, 
+	        Password :  $scope.password
+	    };
+	    var userData = {
+		    Username : $scope.email,
+		    Pool : userPool
+		};
+
+	    var authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
+	    var logins = {};
+	    cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+		cognitoUser.authenticateUser(authenticationDetails, {
+	        onSuccess: function (result) {
+	        	authenticationResult = result;
+	        	logins['cognito-idp.'+__env.config.region+'.amazonaws.com/'+userPoolId] = result.getIdToken().getJwtToken();
+	        	AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+				    IdentityPoolId: identityPoolId,
+				    Logins: logins
+				});				 
+				AWS.config.credentials.get(function(err){
+				    if (err) {
+				        alert(err);
 				    }
 				});
-		    }
-		});
+	        	loadImages(false);
+	        	$scope.authenticated = true;
+	        	$scope.$apply();
+	        }, 
+	        onFailure: function(err) {
+	        	var forceAliasCreation = true;
+	        	userPool.client.makeUnauthenticatedRequest('confirmSignUp', {
+					ClientId: userPool.getClientId(),
+					ConfirmationCode: $scope.password,
+					Username: $scope.email,
+					ForceAliasCreation: forceAliasCreation,
+				}, 
+				err => {
+					if (err) {
+						alert("Failed to authenticate: invalid email, password, or confirmation code");
+					}
+					else {
+						authenticationData['Password'] = "Password1@";
+						authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
+						cognitoUser.authenticateUser(authenticationDetails, {
+					        onSuccess: function (result) {
+					        	authenticationResult = result;	        	
+					        	logins['cognito-idp.us-east-1.amazonaws.com/'+userPoolId] = result.getIdToken().getJwtToken();
+					        	AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+								    IdentityPoolId: identityPoolId,
+								    Logins: logins
+								});				 
+								AWS.config.credentials.get(function(err){
+								    if (err) {
+								        alert(err);
+								    }				  
+								});
+					        	loadImages(false);
+					        	$scope.authenticated = true;
+					        	$scope.$apply();
+					        }, 
+					        onFailure: function(err) {
+					        	alert(err);
+					        }
+					    });
+					}
+				});
+	        }
+    	});
 	};
 
 	var shuffleArray = function (arr) {
@@ -168,7 +280,6 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	        arr[j] = temp;
 	    }
 	    $scope.images = arr;
-
 	    resetCurrent(0);
     	if ($scope.scripts.length > 0) {
 			$scope.hide = true;
@@ -210,7 +321,6 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 			$scope.scripts = [$scope.images[$scope.currentImageIdx]['inc_info']];
 			updateScripts();
 
-			// This is not a good fix...but it works and I'm sick of things not working
 			$timeout(function() { 
 				$scope.hide = true;
 				$scope.load_time = Date.now();
@@ -293,8 +403,8 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 			}
 	};
 
-	$scope.see_images_again = function() {
-		init(true);
+	$scope.seeImagesAgain = function() {
+		loadImages(true);
 	}
 
 	$scope.reload = function () {
@@ -302,8 +412,8 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	};
 
 	$scope.submit = function() {
-		if ($scope.email != '') {
-			init(false);
+		if ($scope.email != '' && $scope.password != '') {
+			init();
 		}
 	};
 });

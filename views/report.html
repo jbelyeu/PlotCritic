@@ -4,21 +4,28 @@
     <meta charset="utf-8">
     <title>PlotCritic Web Report</title>
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+	<script src="https://rawgit.com/aws/amazon-cognito-identity-js/master/dist/aws-cognito-sdk.min.js" > </script>
+	<script src="https://rawgit.com/aws/amazon-cognito-identity-js/master/dist/amazon-cognito-identity.min.js"> </script>
 	<script src="https://sdk.amazonaws.com/js/aws-sdk-2.92.0.min.js"></script>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-	<link rel="stylesheet" href="report.css">
-		<script src="../env.js"></script>
+	<link rel="stylesheet" href="../style/report.css">
+	<script src="../js/env.js"></script>
 
   </head>
 
 <body>
 
 	<div ng-app="svApp" ng-controller="svCtrl">
-	 	<div class="emailInput" ng-hide="hide">
-			<form ng-submit="submit()"">
-			  Enter email:
-			  <input type="email" ng-model="email" name="text" />
-			  <input type="submit" id="submit" value="Submit"/>
+	 	<div class="centeredInput" ng-hide="authenticated">
+			<form ng-submit="submit()">
+				<p class="infoTitle">Sign In: </p>
+				<label for="email" class="emailLabel">User email</label>
+			 	<input type="email" ng-model="email" name="email" required/>
+			 	<br>
+			 	<label for="pass">Password <span style="font-size: 10px;"> (or confirmation code)</span></label>
+			 	<input type="password" ng-model="password" name="pass" required/>
+			 	<br>
+			 	<input type="submit" id="submit" value="Submit"/>
 			</form>
 			<p class='disclaimer'>Your email address will not be used to send unsolicited messages.</p>
 		</div>
@@ -29,9 +36,9 @@
 		</div>
 		
 		<div ng-show="hide" class=main_frame>
-			<button class="logout_button" ng-click=reload()>Log out</button>
+			<button class="logoutButton" ng-click=reload()>Log out</button>
 			<div class="viewer" >
-				<p class="preheader">Results for project `{{project}}`. Use script `retrieval.py` to download data.</p>
+				<p>Results for project `{{project}}`. Use script `retrieval.py` to download data.</p>
 				<table class="table table-bordered">
 					<tr>					
 			        <th>
@@ -58,8 +65,8 @@
 			        	<a href="#" ng-click="orderByField=header[6]; reverseSort = !reverseSort">{{ header[6] }}<span ng-show="orderByField == header[6]"><span ng-show="!reverseSort"> ^ </span><span ng-show="reverseSort"> v </span></span>
 			        	</a>
 			        </th>
-			        <th>
-			        	<a href="#" ng-click="orderByField=header[7]; reverseSort = !reverseSort">{{ header[7] }}<span ng-show="orderByField == header[7]"><span ng-show="!reverseSort"> ^ </span><span ng-show="reverseSort"> v </span></span>
+			         <th>
+			        	<a href="#" ng-click="orderByField=header[7]; reverseSort = !reverseSort">{{ (header[7]).replace("_", " ") }}<span ng-show="orderByField == header[7]"><span ng-show="!reverseSort"> ^ </span><span ng-show="reverseSort"> v </span></span>
 			        	</a>
 			        </th>
 
@@ -79,6 +86,6 @@
 			</div>
 		</div>
 	</div>
-	<script src="report.js"></script>
+	<script src="../js/report.js"></script>
 </body>
 </html

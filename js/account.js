@@ -9,8 +9,8 @@ app.constant('__env', env);
 
 app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) {
 
-	$scope.email = 'jrbelyeu@gmail.com';
-	$scope.password = 'Password1!';
+	$scope.email = '';
+	$scope.password = '';
 	$scope.project = __env.config.projectName;
 	$scope.authenticated = false;
 	$scope.changingPassword = false;
@@ -22,46 +22,45 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	};
 	AWSCognito.config.region = __env.config.region;
 	AWS.config.region = __env.config.region;
-	var userPoolId = 'us-east-1_IdPjLFIi6';
-	var clientID = '2utnr5ojf0hq3tf0djt21g70nm';
-	var identityPoolId = 'us-east-1:03b7746f-e749-4092-8066-5772fd4042e4';
-	var authenticationResult = '';
+	var userPoolId =  __env.config.userPoolId;
+	var clientID = __env.config.clientID;
+	var identityPoolId = __env.config.identityPoolId;
+	var authenticationResult;
 	var userPool;
 	var cognitoUser;
 
+	var init = function() {
+		// Sign user in (depends on pool object) and store token
+		//***************************************************************************
+		userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool({
+		    UserPoolId : userPoolId,
+		    ClientId : clientID 
+		});
 
-   var init = function() {
-	// Sign user in (depends on pool object) and store token
-	//***************************************************************************
-	userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool({
-	    UserPoolId : userPoolId,
-	    ClientId : clientID 
-	});
+		var authenticationData = {
+	        Username : $scope.email, 
+	        Password :  $scope.password
+	    };
+	    var userData = {
+		    Username : $scope.email,
+		    Pool : userPool
+		};
 
-	var authenticationData = {
-        Username : $scope.email, 
-        Password :  $scope.password
-    };
-    var userData = {
-	    Username : $scope.email,
-	    Pool : userPool
-	};
-
-    var authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
-    cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
-	cognitoUser.authenticateUser(authenticationDetails, {
-        onSuccess: function (result) {
-        	authenticationResult = result;
-        	$scope.authenticated = true;
-        	$scope.$apply();        	
-        }, 
-        onFailure: function(err) {
-        	var forceAliasCreation = true;
-        	userPool.client.makeUnauthenticatedRequest('confirmSignUp', {
-				ClientId: userPool.getClientId(),
-				ConfirmationCode: $scope.password,
-				Username: $scope.email,
-				ForceAliasCreation: forceAliasCreation,
+	    var authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
+	    cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+		cognitoUser.authenticateUser(authenticationDetails, {
+	        onSuccess: function (result) {
+	        	authenticationResult = result;
+	        	$scope.authenticated = true;
+	        	$scope.$apply();
+	        }, 
+	        onFailure: function(err) {
+	        	var forceAliasCreation = true;
+	        	userPool.client.makeUnauthenticatedRequest('confirmSignUp', {
+					ClientId: userPool.getClientId(),
+					ConfirmationCode: $scope.password,
+					Username: $scope.email,
+					ForceAliasCreation: forceAliasCreation,
 				}, 
 				err => {
 					if (err) {
@@ -83,7 +82,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 					    });
 					}
 				});
-        	}
+	        }
     	});
 	};
 
@@ -129,8 +128,6 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 		    });
 		}
 	};
-
-
 	
 	$scope.changePassword = function () {
 		if ($scope.newPassword1 && $scope.newPassword2 && $scope.newPassword1 === $scope.newPassword2 ) {

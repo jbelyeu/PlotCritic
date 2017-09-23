@@ -1,3 +1,41 @@
+.userEmail {
+    position: absolute;
+    right: 2%;
+    top: 0%;
+    font-style: italic;
+    font-size: 1.1em;
+}
+
+.centeredInput {
+    width: 75%;
+    height: 75%;
+    position: absolute;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+
+.accountDiv {
+    margin-top: 10%;
+}
+
+.infoTitle {
+    font-size: 20px;
+}
+
+.emailLabel {
+    padding-right: 104px;
+    padding-bottom: 8px;
+}
+
+
+
+
+
+
+
 a {
     text-decoration: none;
     display: inline-block;
@@ -69,7 +107,7 @@ a:hover {
 .unclear_button_dark {
     background-color: #585555;
 }
-.logout_button {
+.logoutButton {
     margin-top: 2px;
     margin-left: 5px;
     padding-bottom: 2px;
@@ -122,26 +160,6 @@ a:hover {
     margin: 0 auto;
 }
 
-.userEmail {
-    position: absolute;
-    right: 2%;
-    top: 0%;
-    font-style: italic;
-    font-size: 1.1em;
-}
-
-.emailInput {
-    width: 25%;
-    height: 100px;
-
-    position: absolute;
-    top:0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-
-    margin: auto;
-}
 .right_button_box {
     margin-left: 50%;
 }
