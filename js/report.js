@@ -11,8 +11,8 @@ app.constant('__env', env);
 
 app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) {
 
-	$scope.email = 'jrbelyeu@gmail.com';
-	$scope.password = 'Password1!';
+	$scope.email = '';
+	$scope.password = '';
 	$scope.authenticated = false;
 	$scope.records = [];
 	$scope.header = ["Project", "Chrom", "Start", "End", "Good", "Bad", "De_novo", "Total_Scores"];

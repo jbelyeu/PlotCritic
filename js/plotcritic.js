@@ -23,8 +23,8 @@ function ($document, $rootScope) {
 
 app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) {
 
-	$scope.email = 'jrbelyeu@gmail.com';
-	$scope.password = 'Password1!';
+	$scope.email = '';
+	$scope.password = '';
 	$scope.scripts = [];
 	$scope.images = [];
 	$scope.currentImageIdx = 0;
