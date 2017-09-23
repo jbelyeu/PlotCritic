@@ -1,0 +1,91 @@
+.userEmail {
+    position: absolute;
+    right: 2%;
+    top: 0%;
+    font-style: italic;
+    font-size: 1.1em;
+}
+
+.centeredInput {
+    width: 75%;
+    height: 75%;
+    position: absolute;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+
+.accountDiv {
+    margin-top: 10%;
+}
+.ownAccount {
+    display: inline-grid;
+    font-size: smaller;
+}
+.addUsersFormSection > *{
+    padding-bottom:5px;
+}
+
+.disclaimer {
+    font-size: .8em;
+}
+
+.infoTitle {
+    font-size: 20px;
+}
+
+.emailLabel {
+    padding-right: 104px;
+    padding-bottom: 8px;
+}
+
+.accountInfoField {
+    display: inline-flex;
+}
+
+.accountInfoFieldTitle {
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.newPasswordLabel1 {
+    margin-right: 20px;
+}
+.newPasswordLabel2 {
+    margin-right: 2px;
+}
+
+.changePasswordBtn {
+    border: 1px solid #aeaeae;
+    background-color: #f4f4f4;
+}
+.cancelBtn {
+    border: 1px solid #aeaeae;
+    background-color: #f4f4f4;
+    margin-top: 2px;
+    width: 60px;
+}
+.deleteAccountBtn {
+    border: 1px solid darkred;
+    background-color: red;
+}
+
+.addUsers {    
+    display: flex;
+}
+
+.addUserInput {
+    width: 200px;
+}
+
+.addFieldBtn {
+    border: none;
+    background-color: white;
+    font-size: 12px;
+}
+
+.deleteAccountForm {
+    margin-top:20px;
+}
