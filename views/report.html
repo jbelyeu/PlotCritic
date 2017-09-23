@@ -62,7 +62,7 @@
 			        	</a>
 			        </th>
 			        <th>
-			        	<a href="#" ng-click="orderByField=header[6]; reverseSort = !reverseSort">{{ header[6] }}<span ng-show="orderByField == header[6]"><span ng-show="!reverseSort"> ^ </span><span ng-show="reverseSort"> v </span></span>
+			        	<a href="#" ng-click="orderByField=header[6]; reverseSort = !reverseSort">{{ (header[6]).replace("_", " ")}}<span ng-show="orderByField == header[6]"><span ng-show="!reverseSort"> ^ </span><span ng-show="reverseSort"> v </span></span>
 			        	</a>
 			        </th>
 			         <th>
@@ -78,7 +78,7 @@
 					    <td>{{ record['End'] }}</td>
 					    <td>{{ ((record['Good'] / record['Total_Scores']) * 100).toFixed(1) }}%</td>
 					    <td>{{ ((record['Bad'] / record['Total_Scores']) * 100).toFixed(1) }}%</td>
-					    <td>{{ ((record['Unclear'] / record['Total_Scores']) * 100).toFixed(1) }}%</td>
+					    <td>{{ ((record['Denovo'] / record['Total_Scores']) * 100).toFixed(1) }}%</td>
 					    <td>{{ record['Total_Scores'] }}</td>
 				  </tr>
 				</table>

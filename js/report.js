@@ -15,7 +15,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	$scope.password = 'Password1!';
 	$scope.authenticated = false;
 	$scope.records = [];
-	$scope.header = ["Project", "Chrom", "Start", "End", "Good", "Bad", "Unclear", "Total_Scores"];
+	$scope.header = ["Project", "Chrom", "Start", "End", "Good", "Bad", "De_novo", "Total_Scores"];
 	$scope.hide = false;
 	$scope.orderByField = 'Project';
  	$scope.reverseSort = false;
@@ -45,7 +45,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	    			'End'			: parseInt(score_item['end']),
 	    			'Good' 			: 0,
 	    			'Bad' 			: 0,
-	    			'Unclear' 		: 0,
+	    			'Denovo' 		: 0,
 	    			'Total_Scores' 	: 0
 	    		};
     		}
@@ -57,7 +57,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
     			summary_data[img_url]['Bad'] += 1;
     		}
     		else {
-    			summary_data[img_url]['Unclear'] += 1;
+    			summary_data[img_url]['Denovo'] += 1;
     		}
     	});
     	$scope.records = Object.values(summary_data);
