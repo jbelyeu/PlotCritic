@@ -46,10 +46,10 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	    			'Good' 			: 0,
 	    			'Bad' 			: 0,
 	    			'Unclear' 		: 0,
-	    			'Total Scores' 	: 0
+	    			'Total_Scores' 	: 0
 	    		};
     		}
-    		summary_data[img_url]['Total Scores'] += 1;
+    		summary_data[img_url]['Total_Scores'] += 1;
     		if (score_item['score'] === true) {
     			summary_data[img_url]['Good'] += 1;
     		}
