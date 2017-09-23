@@ -98,3 +98,26 @@
 .infoTitle {
     font-size: 20px;
 }
+
+.welcome {
+    margin-top: 5%;
+}
+.header {
+    font-size: 32px;
+    margin: 0 auto;
+}
+.subheader {
+    font-size: 18px;
+    margin: 0 auto;
+}
+.wrapper {
+  text-align: center;
+}
+.links {
+  display: inline-block;
+}
+a {
+    font-size: 22px;
+    margin: 5px 15px 5px 15px;
+    color: black;
+}
