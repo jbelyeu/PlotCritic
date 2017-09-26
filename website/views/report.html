@@ -61,11 +61,11 @@
 			        	</a>
 			        </th>
 			        <th>
-			        	<a href="#" ng-click="orderByField=header[4]; reverseSort = !reverseSort">{{ header[4] }}<span ng-show="orderByField == header[4]"><span ng-show="!reverseSort"> ^ </span><span ng-show="reverseSort"> v </span></span>
+			        	<a href="#" ng-click="orderByField=header[4]; reverseSort = !reverseSort">{{ (header[4]).replace("_", " ") }}<span ng-show="orderByField == header[4]"><span ng-show="!reverseSort"> ^ </span><span ng-show="reverseSort"> v </span></span>
 			        	</a>
 			        </th>
 			        <th>
-			        	<a href="#" ng-click="orderByField=header[5]; reverseSort = !reverseSort">{{ header[5] }}<span ng-show="orderByField == header[5]"><span ng-show="!reverseSort"> ^ </span><span ng-show="reverseSort"> v </span></span>
+			        	<a href="#" ng-click="orderByField=header[5]; reverseSort = !reverseSort">{{ (header[5]).replace("_", " ") }}<span ng-show="orderByField == header[5]"><span ng-show="!reverseSort"> ^ </span><span ng-show="reverseSort"> v </span></span>
 			        	</a>
 			        </th>
 			        <th>
@@ -83,9 +83,9 @@
 					    <td>{{ record['Chrom'] }}</td>
 					    <td>{{ record['Start'] }}</td>
 					    <td>{{ record['End'] }}</td>
-					    <td>{{ record['Good'].toFixed(1) }}%</td>
-					    <td>{{ record['Bad'].toFixed(1) }}%</td>
-					    <td>{{ record['De_novo'].toFixed(1) }}%</td>
+					    <td>{{ record['s'].toFixed(1) }}%</td>
+					    <td>{{ record['n'].toFixed(1) }}%</td>
+					    <td>{{ record['d'].toFixed(1) }}%</td>
 					    <td>{{ record['Total_Scores'] }}</td>
 				  </tr>
 				</table>

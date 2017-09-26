@@ -20,9 +20,12 @@ parser.add_argument('-v', "--verbose",
         help="Run verbosely. If not specified, entries missing fields will be omitted",
         required=False,
         action="store_true")
+parser.add_argument('-c', "--config_file", 
+        help="Configuration file with AWS credentials",
+        required=True)
 args = parser.parse_args()
 
-with open("config.json",'r') as config_file:
+with open(args.config_file,'r') as config_file:
     config_data = json.load(config_file)
 dynamodb = boto3.resource('dynamodb', 
     region_name=config_data['region'], 

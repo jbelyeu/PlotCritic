@@ -20,6 +20,11 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	$scope.orderByField = 'Project';
  	$scope.reverseSort = false;
  	$scope.project = __env.config.projectName;
+ 	$scope.reportFields = __env.config.reportFields;
+ 	$scope.curationAnswers = [];
+ 	for (key in __env.config.curationQandA.answers) {
+		$scope.curationAnswers.push([key, __env.config.curationQandA.answers[key]]);
+	}
  	AWSCognito.config.apiVersions = {
 		cognitoidentityserviceprovider: '2016-04-18'
 	};
@@ -33,6 +38,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	var cognitoUser;
 
 	var showReport = function(rawData) {
+
     	summary_data = {};
     	rawData.forEach(function (score_item) {
     		var img_url = score_item['image'];
@@ -46,32 +52,28 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	    			'Chrom' 		: score_item['chrom'],
 	    			'Start' 		: parseInt(score_item['start']),
 	    			'End'			: parseInt(score_item['end']),
-	    			'Good' 			: 0,
-	    			'Bad' 			: 0,
-	    			'De_novo' 		: 0,
 	    			'Total_Scores' 	: 0
 	    		};
-    		}
-    		summary_data[img_url]['Total_Scores'] += 1;
-    		if (score_item['score'] === true) {
-    			summary_data[img_url]['Good'] += 1;
-    		}
-    		else if (score_item['score'] === false) {
-    			summary_data[img_url]['Bad'] += 1;
-    		}
-    		else {
-    			summary_data[img_url]['De_novo'] += 1;
-    		}
-    	});
-    	for (var img in summary_data) { 
-    		var good_count = summary_data[img]['Good'] *1.0;
-    		var bad_count = summary_data[img]['Bad'] *1.0;
-    		var denovo_count = summary_data[img]['De_novo'] *1.0;
-    		var total_count = summary_data[img]['Total_Scores'] *1.0;
+	    		for (var idx in $scope.curationAnswers) {
+	    			var curationAnswer = $scope.curationAnswers[idx];
+	    			summary_data[img_url][curationAnswer[0]] = 0;
+	    		}
 
-    		summary_data[img]['Good'] = ((good_count/total_count)*100.0);
-    		summary_data[img]['Bad'] = ((bad_count/total_count)*100.0);
-    		summary_data[img]['De_novo'] = ((denovo_count/total_count)*100.0);
+    		}
+    		for (var idx in $scope.curationAnswers) {
+	    		var curationAnswer = $scope.curationAnswers[idx];
+    			if (score_item['score'] === curationAnswer[1]) {
+    				summary_data[img_url][curationAnswer[0]] += 1.0;
+    			}
+    		}
+    		summary_data[img_url]['Total_Scores'] += 1.0;
+    	});
+
+    	for (var img in summary_data) {
+    		for (var idx in $scope.curationAnswers) {
+	    		var curationAnswer = $scope.curationAnswers[idx];
+    			summary_data[img][curationAnswer[0]] = (summary_data[img][curationAnswer[0]] / summary_data[img]['Total_Scores']);
+    		}
     	}
     	$scope.records = Object.values(summary_data);
     	$scope.$apply();

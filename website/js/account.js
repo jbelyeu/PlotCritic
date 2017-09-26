@@ -135,7 +135,8 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 				cognitoUser.changePassword($scope.password, $scope.newPassword1, function(err, result) {
 			        if (err) {
 			            alert("Invalid password. Passwords must be at least 6 characters long and contain "+
-			            	"at least one of the following: lowercase letters, uppercase letters, numbers, and symbols");			            
+			            	"at least one of the following: lowercase letters, uppercase letters, numbers, and symbols");
+			            	console.log(err);            
 			            return;
 			        }
 			        $scope.changingPassword = false;
@@ -161,4 +162,5 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 			init();
 		}
 	};
+
 });

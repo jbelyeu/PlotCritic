@@ -5,10 +5,7 @@ if(window){
 }
 
 var app = angular.module("svApp", []);
-
-
 app.constant('__env', env);
-
 app.directive('keypressEvents',
 function ($document, $rootScope) {
     return {
@@ -39,6 +36,12 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	$scope.load_time;
 	$scope.project = __env.config.projectName;
 	$scope.authenticated = false;
+	$scope.curationQuestion = __env.config.curationQandA.question;
+	$scope.curationAnswers = [];
+	for (key in __env.config.curationQandA.answers) {
+		$scope.curationAnswers.push([key, __env.config.curationQandA.answers[key]]);
+	}
+
 	AWSCognito.config.apiVersions = {
 		cognitoidentityserviceprovider: '2016-04-18'
 	};
@@ -54,59 +57,20 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
     $rootScope.$on('keypress', function (evt, obj, key) {
         $scope.$apply(function () {
         	if ($scope.scripts.length > 0) {
-        		if (key == 'g' || key == 'G') {
-	            	$scope.goodVariant();
-	            }
-	            else if (key == 'b' || key == 'B') {
-	            	$scope.badVariant();
-	            }
-	            else if (key == 'd' || key == 'D') {
-	            	$scope.denovoVariant();
-	            }
+        		$scope.sendScore($scope.curationAnswers[key]);
+
+        		// if (key == 'g' || key == 'G') {
+	         //    	$scope.goodVariant();
+	         //    }
+	         //    else if (key == 'b' || key == 'B') {
+	         //    	$scope.badVariant();
+	         //    }
+	         //    else if (key == 'd' || key == 'D') {
+	         //    	$scope.denovoVariant();
+	         //    }
         	}            
         });
     })
-
-	var sendScore = function(flag) {
-		AWS.config.update({
-			accessKeyId: __env.config.accessKey, 
-			secretAccessKey: __env.config.secretAccessKey,
-			endpoint: "https://dynamodb." + __env.config.dynamoRegion + ".amazonaws.com",
-			region: __env.config.dynamoRegion
-		});
-
-		var docClient = new AWS.DynamoDB.DocumentClient();
-		var now = Date.now();
-
-		var imageID = "";
-		if (typeof $scope.images[$scope.currentImageIdx]['inc_info'] === "string") {
-			imageID = $scope.images[$scope.currentImageIdx]['inc_info'];
-		}
-		else {
-			imageID = $scope.images[$scope.currentImageIdx]['inc_info']['src'];
-		}
-		var params = {
-		    TableName:__env.config.dynamoScoresTable,
-		    Item:{
-		    	'identifier': $scope.email + "_" + now,
-		        "email": $scope.email,
-		        'image': imageID,
-		        'bucket': __env.config.AWSBucketURl,
-		        'response_time': now,
-		        'load_time': $scope.load_time,
-		        'project' : __env.config.projectName,
-		        'score': flag,
-		        'chrom': $scope.images[$scope.currentImageIdx]['chr'],
-		        'start': $scope.images[$scope.currentImageIdx]['start'],
-		        'end': $scope.images[$scope.currentImageIdx]['end']
-		    }
-		};
-		docClient.put(params, function(err, data) {
-		    if (err) {
-		        console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
-		    }
-		});
-	};
 
 	var filterImages = function(seeAgain) {
 		var scores = [];
@@ -328,38 +292,38 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 		}
 	};
 
-	//scope functions
-	$scope.goodVariant = function () {
-		$scope.goodButton.push("good_button_dark");
-		$scope.variantImgSelected = "variantImgGood";
-		sendScore(true); 
-		$timeout(function() { 
-			$scope.goodButton.pop();
-			$scope.variantImgSelected = "";
-			$scope.next();
-		}, 100);
-	};
+	$scope.sendScore = function(option) {
+		AWS.config.update({
+			endpoint: "https://dynamodb." + __env.config.dynamoRegion + ".amazonaws.com",
+		});
 
-	$scope.denovoVariant = function () {
-		$scope.denovoButton.push("denovo_button_dark");
-		$scope.variantImgSelected = "variantImgDenovo";
-		sendScore('denovo');
-		$timeout(function() { 
-			$scope.denovoButton.pop();
-			$scope.variantImgSelected = "";
-			$scope.next();
-		}, 100);
-	};
-
-	$scope.badVariant = function () {
-		$scope.badButton.push("bad_button_dark");
-		$scope.variantImgSelected = "variantImgBad";
-		sendScore(false);
-		$timeout(function() { 
-			$scope.badButton.pop();
-			$scope.variantImgSelected = "";
-			$scope.next();
-		}, 100);
+		var docClient = new AWS.DynamoDB.DocumentClient();
+		var now = Date.now();
+		var imageID = $scope.images[$scope.currentImageIdx]['inc_info'];
+		var params = {
+		    TableName:__env.config.dynamoScoresTable,
+		    Item:{
+		    	'identifier': $scope.email + "_" + now,
+		        "email": $scope.email,
+		        'image': imageID,
+		        'bucket': __env.config.AWSBucketURl,
+		        'response_time': now,
+		        'load_time': $scope.load_time,
+		        'project' : __env.config.projectName,
+		        'score': __env.config.curationQandA.answers[option],
+		        'chrom': $scope.images[$scope.currentImageIdx]['chr'],
+		        'start': $scope.images[$scope.currentImageIdx]['start'],
+		        'end': $scope.images[$scope.currentImageIdx]['end']
+		    }
+		};
+		docClient.put(params, function(err, data) {
+		    if (err) {
+		        console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
+		    }
+		    else {
+		    	$scope.next();
+		    }
+		});
 	};
 
 	$scope.previous = function () {
