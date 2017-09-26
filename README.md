@@ -1,7 +1,5 @@
-# sveee
-Contains code for both the [website](http://home.chpc.utah.edu/~u1072557/sveee/sveee.html) and data retrieval script for sveee.
-Purpose of the tool is to simplify creation of a high-quality truth set of structural variants.
-Web page displays image files of read alignments for visual scoring and sends scores to DynamoDB back end.
+# PlotCritic
+Contains code for PlotCritic, a user-friendly and easily deployed tool for image scoring, supported by AWS backend resources.
 
 ## Website Deployment
 Prep:
@@ -29,6 +27,29 @@ You will receive an email with the URL for your new website, with a confirmation
 
 ## More Options (Also under development)
 ### Retrieval Script
-Python script "retrieval.py" retrieves data from the DynamoDB table and prints it out as tab-separated lines.
+The `retrieval.py` script retrieves data from the DynamoDB table and prints it out as tab-separated lines, allowing you to create custom reports.
+
+Usage:
+```
+python retrieval.py 
+```
+
+The `-f` (filters) option allows you to pass in key-value pairs to filter the results. 
+The following example shows only results from a project named "my_project":
+```
+python retrieval.py  -f "project","my_project"
+```
 
 ### Delete Project
+The `delete_project.py` script allows you to delete a project to clean up after finishing, using configuration information from the config.json file created during setup. 
+
+Usage:
+```
+python delete_project.py 
+```
+
+If `-f` (full-deletion) option is not selected, you can choose to keep various resources, such as the S3 bucket containing your images and the DynamoDB tables with scoring results. If `-f` is selected, however, all external resources will be deleted permanently.
+The following example deletes the entire project and all related resources:
+```
+python delete_project.py -f
+```
