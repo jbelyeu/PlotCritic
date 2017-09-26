@@ -1,12 +1,37 @@
-a {
-    text-decoration: none;
-    display: inline-block;
-    padding: 8px 16px;
+.userEmail {
+    position: absolute;
+    right: 2%;
+    top: 0%;
+    font-style: italic;
+    font-size: 1.1em;
 }
 
-a:hover {
-    background-color: #ddd;
-    color: black;
+.centeredInput {
+    width: 75%;
+    height: 75%;
+    position: absolute;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+
+.accountDiv {
+    margin-top: 10%;
+}
+
+.infoTitle {
+    font-size: 20px;
+}
+
+.emailLabel {
+    padding-right: 104px;
+    padding-bottom: 8px;
+}
+.curationQuestion {
+    
+
 }
 .hidden {
     display: none;
@@ -60,9 +85,6 @@ a:hover {
     background-color: #ba004c;
     /*margin-left: 1%;*/
 }
-.denovo_button {
-    background-color: green;
-}
 .bad_button_dark {
     background-color: #79304a;
 }
@@ -72,7 +94,7 @@ a:hover {
 .unclear_button_dark {
     background-color: #585555;
 }
-.logout_button {
+.logoutButton {
     margin-top: 2px;
     margin-left: 5px;
     padding-bottom: 2px;
@@ -90,8 +112,11 @@ a:hover {
 }
 
 .viewer {
+    width: fit-content;
+    padding: 10px;
+
     width:810vw;
-    height:50vh;
+    height:80vh;
     display:table-cell;
     vertical-align:middle;
     text-align:center;
@@ -106,9 +131,8 @@ a:hover {
 
 .variantImgInside{
     border: 2px solid black;
-    width: -webkit-fill-available;
-    max-height: 80%;
-    max-width: 1200px;
+    max-height: 50%;
+    max-width: 50%;
 }
 
 .button_box {
@@ -123,29 +147,32 @@ a:hover {
     margin: 0 auto;
 }
 
-.userEmail {
-    position: absolute;
-    right: 2%;
-    top: 0%;
-    font-style: italic;
-    font-size: 1.1em;
-}
-
-.emailInput {
-    width: 25%;
-    height: 100px;
-
-    position: absolute;
-    top:0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-
-    margin: auto;
-}
 .right_button_box {
     margin-left: 50%;
 }
 .disclaimer {
     font-size: .8em;
+}
+
+.welcome {
+    margin-top: 5%;
+}
+.header {
+    font-size: 32px;
+    margin: 0 auto;
+}
+.subheader {
+    font-size: 18px;
+    margin: 0 auto;
+}
+.wrapper {
+  text-align: center;
+}
+.links {
+  display: inline-block;
+}
+a {
+    font-size: 22px;
+    margin: 5px 15px 5px 15px;
+    color: black;
 }
