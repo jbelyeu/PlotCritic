@@ -6,9 +6,8 @@ import os
 import json
 import argparse
 import boto3
-from boto3.s3.transfer import S3Transfer
 
-parser = argparse.ArgumentParser(description="")
+parser = argparse.ArgumentParser(description="Set up a PlotCritic Project")
 parser.add_argument('-p', "--project", 
     help="Unique name for the project",
     required=True
