@@ -25,7 +25,7 @@ You will receive an email with the URL for your new website, with a confirmation
 
 
 
-## More Options (Also under development)
+## More Options
 ### Retrieval Script
 The `retrieval.py` script retrieves data from the DynamoDB table and prints it out as tab-separated lines, allowing you to create custom reports.
 
@@ -53,3 +53,6 @@ The following example deletes the entire project and all related resources:
 ```
 python delete_project.py -f
 ```
+
+### HTTPS
+For additional security, use AWS Cloudfront to deploy with an SSL certificate through the Amazon Credential Manager (ACM). Further instructions available [here](http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/GettingStarted.html).
