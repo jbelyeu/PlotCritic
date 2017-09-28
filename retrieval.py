@@ -8,24 +8,33 @@ import argparse
 
 def key_val(arg):
     return [str(x) for x in arg.split(',')]
+
+rel_path = os.path.dirname(sys.argv[0])
 parser = argparse.ArgumentParser(
-        description="Tool for retrieving entries from the SVeee DynamoDB tables")
+    description="Tool for retrieving entries from the SVeee DynamoDB tables")
 parser.add_argument('-f', "--filters", 
-        help="comma-separated key,values pairs of filters for entries to report (i.e: 'key1','value1' 'key2','value2'",
-        required=False, 
-        type=key_val, 
-        nargs="+")
+    help="comma-separated key,values pairs of filters for entries to report (i.e: 'key1','value1' 'key2','value2'",
+    required=False, 
+    type=key_val, 
+    nargs="+")
 parser.add_argument('-v', "--verbose", 
-        help="Run verbosely. If not specified, entries missing fields will be omitted",
-        required=False,
-        action="store_true")
-parser.add_argument('-c', "--config_file", 
-        help="Configuration file with AWS credentials",
-        required=True)
+    help="Run verbosely. If not specified, entries missing fields will be omitted",
+    required=False,
+    action="store_true")
+parser.add_argument("-c","--config",
+    dest="config",
+    help="Config file for accessing AWS resources. If not included, defaults to "+rel_path+'config.json',
+    required=False)
 args = parser.parse_args()
 
-with open(args.config_file,'r') as config_file:
-    config_data = json.load(config_file)
+try:
+    conf_filename = rel_path+'config.json'
+    if args.config: 
+        conf_filename = args.config 
+    with open(conf_filename, 'r') as config_file:
+        config_data = json.load(config_file)
+except:
+    print ("Error: missing configuration file: " + conf_filename)
 dynamodb = boto3.resource('dynamodb', 
     region_name=config_data['region'], 
     endpoint_url=config_data['dynamoEndpoint'],
