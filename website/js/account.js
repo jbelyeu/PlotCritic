@@ -130,27 +130,42 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	};
 	
 	$scope.changePassword = function () {
-		if ($scope.newPassword1 && $scope.newPassword2 && $scope.newPassword1 === $scope.newPassword2 ) {
-			if ($scope.newPassword1 !== "Password1@") {	
-				cognitoUser.changePassword($scope.password, $scope.newPassword1, function(err, result) {
-			        if (err) {
-			            alert("Invalid password. Passwords must be at least 6 characters long and contain "+
-			            	"at least one of the following: lowercase letters, uppercase letters, numbers, and symbols");
-			            	console.log(err);            
-			            return;
-			        }
-			        $scope.changingPassword = false;
-			        $scope.password = $scope.newPassword1;
-					alert ("Password updated");
-			    });				
-			}
-			else {
-				alert ("Invalid/insecure password");
-			}
-		}
-		else {
+		if ( !$scope.newPassword1 || !$scope.newPassword2) {
+			alert ("Please enter your new password twice to verify it");
+			return;
+		} 
+		if ($scope.newPassword1 !== $scope.newPassword2 ) {
 			alert ("Mismatched passwords");
-		}		
+			return;
+		}
+		if ($scope.newPassword1 === "Password1@") {
+			alert ("Invalid/insecure password");
+			return;
+		}
+		if ($scope.newPassword1.length < 6) {
+			alert("Invalid password. Passwords must be at least 6 characters long");
+			return;
+		}
+		cognitoUser.changePassword($scope.password, $scope.newPassword1, function(err, result) {
+	        if (err) {
+	        	cognitoUser.changePassword("Password1@", $scope.newPassword1, function(err, result) {
+	        		if (err) {
+	        			alert("Failed to update password. You may have exceeded your attempt limit for now.");
+		            	console.log(err);
+	        		}
+	        		else {
+				        $scope.changingPassword = false;
+				        $scope.password = $scope.newPassword1;
+						alert ("Password updated");
+	        		}
+	        	});
+	        }
+	        else {
+		       	$scope.changingPassword = false;
+		        $scope.password = $scope.newPassword1;
+				alert ("Password updated");
+	        }
+	    });
 	};	
 
 	$scope.reload = function () {
