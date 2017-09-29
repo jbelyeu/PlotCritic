@@ -143,7 +143,7 @@ try:
         ],
         VerificationMessageTemplate={
             'EmailMessage': 'You have been invited to join a PlotCritic project. ' +
-                'Enter this email ('+ args.email+') confirmation code {####} as password at ' + 
+                'Enter the email this message is addressed to and this confirmation code {####} as password at ' + 
                 bucket_endpoint + " to begin.",
             'EmailSubject': 'PlotCritic Invitation',
             'DefaultEmailOption': 'CONFIRM_WITH_CODE'
