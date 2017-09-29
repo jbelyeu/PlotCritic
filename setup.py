@@ -50,8 +50,9 @@ try:
         }
     )
     bucket_endpoint = "http://"+ bucket_name + ".s3-website-us-east-1.amazonaws.com"
-except:
+except Exception as e:
     print ("Error: Failed to create S3 bucket. Exiting setup")
+    print (e)
     sys.exit(1)
 
 #create dynamoDB img table (named {project}_img_metadata)
@@ -82,8 +83,9 @@ try:
             'WriteCapacityUnits': 5
         },
     )
-except:
+except Exception as e:
     print ("Error: Failed to create DynamoDB table. Exiting setup")
+    print (e)
     sys.exit(1)
 
 #create dynamoDB scores table (named {project}_scores)
@@ -109,8 +111,9 @@ try:
             'WriteCapacityUnits': 5
         },
     )
-except:
+except Exception as e:
     print ("Error: Failed to create DynamoDB table. Exiting setup")
+    print (e)
     sys.exit(1)
 
 #Create user pool (authentication on the app)
@@ -152,8 +155,9 @@ try:
     user_pool_id = user_pool_response['UserPool']['Id']
     user_pool_region = user_pool_id.split("_")[0]
     user_pool_provider_name = "cognito-idp." + user_pool_region + ".amazonaws.com/" + user_pool_id
-except:
+except Exception as e:
     print ("Error: Failed to create User Pool. Exiting setup")
+    print (e)
     sys.exit(1)
 
 #Create user pool client (get code to associate application with the user pool)
@@ -164,8 +168,9 @@ try:
         ClientName='PlotCriticClient',
         GenerateSecret=False
     )
-except:
+except Exception as e:
     print ("Error: Failed to create User Pool Client. Exiting setup")
+    print (e)
     sys.exit(1)
 
 #create identity pool
@@ -185,8 +190,9 @@ try:
             }
         ]
     )
-except:
+except Exception as e:
     print ("Error: Failed to create Identity Pool. Exiting setup")
+    print (e)
     sys.exit(1)
 
 #identity pool access policy
@@ -224,8 +230,9 @@ try:
         AssumeRolePolicyDocument=json.dumps(policy),
         Description='PlotCritic role for ' + args.project
     )
-except:
+except Exception as e:
     print ("Error: Failed to create IAM Role. Exiting setup")
+    print (e)
     sys.exit(1)
 
 #attach role policy for full dynamo access
@@ -236,8 +243,9 @@ try:
         RoleName=role_name,
         PolicyArn='arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess'
     )
-except:
+except Exception as e:
     print ("Error: Failed to attach Identity Role Policy. Exiting setup")
+    print (e)
     sys.exit(1)
 
 
@@ -250,8 +258,9 @@ try:
             'authenticated': iam_role_response['Role']['Arn']
         }
     )
-except:
+except Exception as e:
     print ("Error: Failed to attach Role to Identity Pool. Exiting setup")
+    print (e)
     sys.exit(1)
 
 #create user in the user pool
@@ -268,8 +277,9 @@ try:
             }
         ]
     )
-except:
+except Exception as e:
     print ("Error: Failed to create User Pool user. Exiting setup")
+    print (e)
     sys.exit(1)
 
 #write out the environment variables to env.js
@@ -299,19 +309,20 @@ try:
         ]}
     env_footer = "}(this));"
     rel_path = os.path.dirname(sys.argv[0])
-    with open(rel_path+"website/js/env.js", 'w') as env_file:
+    with open(os.path.join(rel_path,"website/js/env.js"), 'w') as env_file:
         env_file.write(env_header)
         json.dump(env_obj, env_file)
         env_file.write(env_footer)
 
     env_obj['accessKey'] = args.access_key_id
     env_obj['secretAccessKey'] = args.secret_access_key
-    with open(rel_path+"config.json", 'w') as conf_file:
+    with open(os.path.join(rel_path,"config.json"), 'w') as conf_file:
         json.dump(env_obj, conf_file)
-except:
-    print ("Error: Failed to write out necessary config data: ")
+except Exception as e:
+    print ("Error: Failed to write out config data: ")
     print (env_obj)
     print ("Exiting setup")
+    print (e)
     sys.exit(1)
 
 #upload the website code to S3 - apparently has to be done one file at a time
@@ -321,7 +332,7 @@ try:
         aws_access_key_id=args.access_key_id,
         aws_secret_access_key=args.secret_access_key
     )
-    for subdir, dirs, files in os.walk(rel_path+"website/"):
+    for subdir, dirs, files in os.walk(os.path.join(rel_path,"website/")):
         for file_name in files:
             if file_name[0] == ".":
                 continue
@@ -329,7 +340,7 @@ try:
             if file_name[-3:] == "css":
                 content_type = "text/css"
             full_path = os.path.join(subdir, file_name)
-            key = full_path.replace(rel_path+"website/", "")
+            key = full_path.replace(os.path.join(rel_path,"website/"), "")
             s3_resource.meta.client.upload_file(
                 full_path,
                 bucket_name,
@@ -339,6 +350,7 @@ try:
                     'ContentType' : content_type
                 }
             )
-except:
+except Exception as e:
     print ("Error: Failed to upload website to S3 bucket. Exiting setup")
+    print (e)
     sys.exit(1)

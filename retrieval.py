@@ -23,7 +23,8 @@ parser.add_argument('-v', "--verbose",
     action="store_true")
 parser.add_argument("-c","--config",
     dest="config",
-    help="Config file for accessing AWS resources. If not included, defaults to "+rel_path+'config.json',
+    help="Config file for accessing AWS resources. If not included, defaults to " +
+        os.path.join(rel_path,'config.json'),
     required=False)
 args = parser.parse_args()
 

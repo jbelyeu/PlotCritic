@@ -2,9 +2,16 @@
 from __future__ import print_function
 # Python 2/3 compatibility
 import sys
+import os
 import json
 import argparse
 import boto3
+import yaml
+
+if sys.version_info[0] == 3:
+    print ("Error: You are running Python 3.x. This script requires Python 2.x")
+    sys.exit(1)
+
 #TODO wrap all deletions in try/excepts so it will keep trying if it fails on one
 parser = argparse.ArgumentParser(description="Delete a PlotCritic project. "+
         "Gets info from the `config.json` file created during setup")
@@ -15,22 +22,19 @@ parser.add_argument('-f', "--full-delete",
     action='store_true'
 )
 args = parser.parse_args()
+rel_path = os.path.dirname(sys.argv[0])
 try:
-    with open(rel_path+'config.json', 'r') as config_file:
+    with open(os.path.join(rel_path,'config.json'), 'r') as config_file:
         config_data = json.load(config_file)
 except:
-    print ("Error: missing configuration file " + rel_path + 'config.json.')
+    print ("Error: missing configuration file " + os.path.join(rel_path,'config.json'))
+    sys.exit(1)
 
-#TODO make input work for python 3
-try:
-    if args.full_delete:
-        confirmation = raw_input("Are you sure you want to delete project `" + 
-            config_data['projectName']+"` resources (y/n)?: ")
-        if confirmation != "y":
-            sys.exit(0)
-except:
-    print ("Delete failed. Make sure you are using python version 2.7. This script does not support Python 3.x")
-    sys.exit(0)
+if args.full_delete:
+    confirmation = raw_input("Are you sure you want to delete project `" + 
+        config_data['projectName']+"` resources (y/n)?: ")
+    if confirmation != "y":
+        sys.exit(0)
 
 # delete s3 bucket
 ######################################################################
@@ -46,8 +50,9 @@ try:
         bucket = s3_resource.Bucket(config_data['AWSBucketName'])
         bucket.objects.all().delete()
         bucket.delete()
-except:
+except Exception as e:
     print ("Warning: Failed to delete S3 bucket")
+    print (e)
 
 # delete dynamoDB images table
 ######################################################################
@@ -64,8 +69,9 @@ try:
         delete_img_table_response = dynamodb_client.delete_table(
             TableName=config_data['dynamoImagesTable']
         )
-except:
+except Exception as e:
     print ("Warning: Failed to delete DynamoDB Table")
+    print (e)
 
 # delete dynamodb scores table
 ######################################################################
@@ -77,25 +83,27 @@ try:
         delete_scores_table_response = dynamodb_client.delete_table(
             TableName=config_data['dynamoScoresTable']
         )
-except:
+except Exception as e:
     print ("Warning: Failed to delete DynamoDB Table")
+    print (e)
 
 # delete user pool
 ######################################################################
 try:
-if not args.full_delete:
-    confirmation = raw_input("Are you sure you want to delete User Pool `" + 
-        "for `"+config_data['projectName']+"` (y/n)?: ")
-if confirmation == 'y' or args.full_delete:
-    cognito_identity_provider_client = boto3.client('cognito-idp',
-        aws_access_key_id=config_data['accessKey'],
-        aws_secret_access_key=config_data['secretAccessKey']
-    )
-    delete_user_pool_response = cognito_identity_provider_client.delete_user_pool(
-        UserPoolId=config_data['userPoolId']
-    )
-except:
+    if not args.full_delete:
+        confirmation = raw_input("Are you sure you want to delete User Pool `" + 
+            "for `"+config_data['projectName']+"` (y/n)?: ")
+    if confirmation == 'y' or args.full_delete:
+        cognito_identity_provider_client = boto3.client('cognito-idp',
+            aws_access_key_id=config_data['accessKey'],
+            aws_secret_access_key=config_data['secretAccessKey']
+        )
+        delete_user_pool_response = cognito_identity_provider_client.delete_user_pool(
+            UserPoolId=config_data['userPoolId']
+        )
+except Exception as e:
     print ("Warning: Failed to delete User Pool")
+    print (e)
 
 # delete identity pool
 ######################################################################
@@ -112,9 +120,9 @@ try:
         delete_identity_pool_response = cognito_identity_pool_client.delete_identity_pool(
             IdentityPoolId=config_data['identityPoolId']
         )
-except:
+except Exception as e:
     print ("Warning: Failed to delete Identity Pool")
-
+    print (e)
 
 # delete IAM role
 ######################################################################
@@ -141,5 +149,9 @@ try:
         delete_iam_role_response = iam_client.delete_role(
             RoleName=role_name
         )
-except:
+except Exception as e:
     print ("Warning: Failed to delete Identity Pool")
+    print (e)
+
+print ("Delete operation complete. You should review your AWS account to ensure that "+
+        "all entities were properly removed.")
