@@ -303,7 +303,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 		var params = {
 		    TableName:__env.config.dynamoScoresTable,
 		    Item:{
-		    	'identifier': $scope.email + "_" + now,
+		    	'id': $scope.email + "_" + now,
 		        "email": $scope.email,
 		        'image': imageID,
 		        'bucket': __env.config.AWSBucketURl,
