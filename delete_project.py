@@ -8,11 +8,9 @@ import argparse
 import boto3
 import yaml
 
-if sys.version_info[0] == 3:
-    print ("Error: You are running Python 3.x. This script requires Python 2.x")
-    sys.exit(1)
+try: input = input
+except NameError: pass
 
-#TODO wrap all deletions in try/excepts so it will keep trying if it fails on one
 parser = argparse.ArgumentParser(description="Delete a PlotCritic project. "+
         "Gets info from the `config.json` file created during setup")
 parser.add_argument('-f', "--full-delete", 
@@ -31,7 +29,7 @@ except:
     sys.exit(1)
 
 if args.full_delete:
-    confirmation = raw_input("Are you sure you want to delete project `" + 
+    confirmation = input("Are you sure you want to delete project `" + 
         config_data['projectName']+"` resources (y/n)?: ")
     if confirmation != "y":
         sys.exit(0)
@@ -40,7 +38,7 @@ if args.full_delete:
 ######################################################################
 try:
     if not args.full_delete:
-        confirmation = raw_input("Are you sure you want to delete S3 bucket `" + 
+        confirmation = input("Are you sure you want to delete S3 bucket `" + 
             config_data['AWSBucketName']+"` (y/n)?: ")
     if confirmation == "y" or args.full_delete:
         s3_resource = boto3.resource('s3',
@@ -58,7 +56,7 @@ except Exception as e:
 ######################################################################
 try:
     if not args.full_delete:
-        confirmation = raw_input("Are you sure you want to delete DynamoDB table `" + 
+        confirmation = input("Are you sure you want to delete DynamoDB table `" + 
             config_data['dynamoImagesTable']+"` (y/n)?: ")
     if confirmation == "y" or args.full_delete:
         dynamodb_client = boto3.client('dynamodb',
@@ -77,7 +75,7 @@ except Exception as e:
 ######################################################################
 try:
     if not args.full_delete:
-        confirmation = raw_input("Are you sure you want to delete DynamoDB table `" + 
+        confirmation = input("Are you sure you want to delete DynamoDB table `" + 
             config_data['dynamoScoresTable']+"` (y/n)?: ")
     if confirmation == "y" or args.full_delete:
         delete_scores_table_response = dynamodb_client.delete_table(
@@ -91,7 +89,7 @@ except Exception as e:
 ######################################################################
 try:
     if not args.full_delete:
-        confirmation = raw_input("Are you sure you want to delete User Pool `" + 
+        confirmation = input("Are you sure you want to delete User Pool `" + 
             "for `"+config_data['projectName']+"` (y/n)?: ")
     if confirmation == 'y' or args.full_delete:
         cognito_identity_provider_client = boto3.client('cognito-idp',
@@ -109,7 +107,7 @@ except Exception as e:
 ######################################################################
 try:
     if not args.full_delete:
-        confirmation = raw_input("Are you sure you want to delete Identity Pool `" + 
+        confirmation = input("Are you sure you want to delete Identity Pool `" + 
             "for `"+config_data['projectName']+"` (y/n)?: ")
 
     if confirmation == 'y' or args.full_delete:
@@ -128,7 +126,7 @@ except Exception as e:
 ######################################################################
 try:
     if not args.full_delete:
-        confirmation = raw_input("Are you sure you want to delete IAM Role `" + 
+        confirmation = input("Are you sure you want to delete IAM Role `" + 
             "for `"+config_data['projectName']+"` (y/n)?: ")
 
     if confirmation == 'y' or args.full_delete:
