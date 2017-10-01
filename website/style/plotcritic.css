@@ -25,13 +25,11 @@
     font-size: 20px;
 }
 
-.emailLabel {
-    padding-right: 104px;
-    padding-bottom: 8px;
+.passwordLabel {
+    padding-top: 10px;
+    padding-right: 5px;
 }
 .curationQuestion {
-    
-
 }
 .hidden {
     display: none;
@@ -68,10 +66,9 @@
     font-size: 1em;
     cursor: pointer;
     border: 1px solid black;
+    margin: 1px 0px 0px 1px;
 }
-.outliner {
 
-}
 .good_button {
     /*margin-left: 25%;*/
     background-color: #008CBA;
@@ -129,12 +126,6 @@
     border: 5px solid #008CBA !important;
 }
 
-.variantImgInside{
-    border: 2px solid black;
-    max-height: 50%;
-    max-width: 50%;
-}
-
 .button_box {
     width: 50%;
     padding: 10px;
@@ -142,9 +133,16 @@
 }
 
 .variantImg {
-    width: fit-content;
     border: 2px solid black;
+    float:left;
+}
+.variantImgBox {
+    width: fit-content;
     margin: 0 auto;
+}
+.additionalCurationForm {
+    float:left;
+    margin: 0px 0px 0px 2px;
 }
 
 .right_button_box {

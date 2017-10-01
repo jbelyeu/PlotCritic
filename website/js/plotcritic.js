@@ -22,7 +22,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 
 	$scope.email = '';
 	$scope.password = '';
-	$scope.scripts = [];
+	// $scope.scripts = [];
 	$scope.images = [];
 	$scope.currentImageIdx = 0;
 	$scope.goodButton = ["good_button"];
@@ -38,10 +38,12 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	$scope.authenticated = false;
 	$scope.curationQuestion = __env.config.curationQandA.question;
 	$scope.curationAnswers = [];
+	$scope.additionalCurationItems = __env.config.additionalCuration;
+	$scope.additionalCurationResponses = {};
+
 	for (key in __env.config.curationQandA.answers) {
 		$scope.curationAnswers.push([key, __env.config.curationQandA.answers[key]]);
 	}
-
 	AWSCognito.config.apiVersions = {
 		cognitoidentityserviceprovider: '2016-04-18'
 	};
@@ -56,18 +58,8 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 
     $rootScope.$on('keypress', function (evt, obj, key) {
         $scope.$apply(function () {
-        	if ($scope.scripts.length > 0) {
+        	if ($scope.images.length > 0) {
         		$scope.sendScore($scope.curationAnswers[key]);
-
-        		// if (key == 'g' || key == 'G') {
-	         //    	$scope.goodVariant();
-	         //    }
-	         //    else if (key == 'b' || key == 'B') {
-	         //    	$scope.badVariant();
-	         //    }
-	         //    else if (key == 'd' || key == 'D') {
-	         //    	$scope.denovoVariant();
-	         //    }
         	}            
         });
     })
@@ -162,7 +154,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 		//***************************************************************************
 		userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool({
 		    UserPoolId : userPoolId,
-		    ClientId : clientID 
+		    ClientId : clientID
 		});
 
 		var authenticationData = {
@@ -177,17 +169,18 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	    var authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
 	    var logins = {};
 	    cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+    	AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+		    IdentityPoolId: identityPoolId,
+		    Logins: logins
+		});
 		cognitoUser.authenticateUser(authenticationDetails, {
 	        onSuccess: function (result) {
 	        	authenticationResult = result;
-	        	logins['cognito-idp.'+__env.config.region+'.amazonaws.com/'+userPoolId] = result.getIdToken().getJwtToken();
-	        	AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-				    IdentityPoolId: identityPoolId,
-				    Logins: logins
-				});				 
-				AWS.config.credentials.get(function(err){
+	        	logins['cognito-idp.'+__env.config.region+'.amazonaws.com/'+userPoolId] = result.getIdToken().getJwtToken();			 
+				AWS.config.credentials.refresh(function(err){
 				    if (err) {
 				        alert(err);
+				        console.log(err);
 				    }
 				});
 	        	loadImages(false);
@@ -195,43 +188,9 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	        	$scope.$apply();
 	        }, 
 	        onFailure: function(err) {
-	        	var forceAliasCreation = true;
-	        	userPool.client.makeUnauthenticatedRequest('confirmSignUp', {
-					ClientId: userPool.getClientId(),
-					ConfirmationCode: $scope.password,
-					Username: $scope.email,
-					ForceAliasCreation: forceAliasCreation,
-				}, 
-				err => {
-					if (err) {
-						alert("Failed to authenticate: invalid email, password, or confirmation code");
-					}
-					else {
-						authenticationData['Password'] = "Password1@";
-						authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
-						cognitoUser.authenticateUser(authenticationDetails, {
-					        onSuccess: function (result) {
-					        	authenticationResult = result;	        	
-					        	logins['cognito-idp.us-east-1.amazonaws.com/'+userPoolId] = result.getIdToken().getJwtToken();
-					        	AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-								    IdentityPoolId: identityPoolId,
-								    Logins: logins
-								});				 
-								AWS.config.credentials.get(function(err){
-								    if (err) {
-								        alert(err);
-								    }				  
-								});
-					        	loadImages(false);
-					        	$scope.authenticated = true;
-					        	$scope.$apply();
-					        }, 
-					        onFailure: function(err) {
-					        	alert(err);
-					        }
-					    });
-					}
-				});
+	        	console.log(err);
+	        	var element = angular.element( document.querySelector( '#failedAuth' ) );
+				element.removeClass('hidden');
 	        }
     	});
 	};
@@ -245,7 +204,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	    }
 	    $scope.images = arr;
 	    resetCurrent(0);
-    	if ($scope.scripts.length > 0) {
+    	if ($scope.images.length > 0) {
 			$scope.hide = true;
 
 			element = angular.element( document.querySelector( '#allScored' ) );
@@ -257,34 +216,9 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 		}		
 	};
 
-	var updateScripts = function (callback) {
-		element = angular.element( document.querySelector( '#mycontainer' ) );
-        element.empty();
-        angular.forEach($scope.scripts, function (script) {
-        	if (typeof script === 'string') {
-        		var scriptTag = angular.element(document.createElement("img"));
-                scriptTag[0]['src'] = script;
-                scriptTag.addClass("variantImgInside");
-                element.removeClass("variantImg");
-        	}
-        	else {
-            	var scriptTag = angular.element(document.createElement("script"));
-                scriptTag[0]['src'] = script['src'];
-                scriptTag[0]['id'] = script['id'];
-                scriptTag[0]['data-bokeh-model-id'] = script['data-bokeh-model-id'];
-                scriptTag[0]['data-bokeh-doc-id'] = script['data-bokeh-doc-id'];
-                element.addClass("variantImg");
-			}
-            element.append(scriptTag);            
-        });	
-    };
-
 	var resetCurrent = function (change) {
 		if ($scope.images.length > 0) {
 			$scope.currentImageIdx += change;
-			$scope.scripts = [$scope.images[$scope.currentImageIdx]['inc_info']];
-			updateScripts();
-
 			$timeout(function() { 
 				$scope.hide = true;
 				$scope.load_time = Date.now();
@@ -293,6 +227,9 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	};
 
 	$scope.sendScore = function(option) {
+		console.log($scope.additionalCurationResponses);
+    	$scope.next();
+
 		AWS.config.update({
 			endpoint: "https://dynamodb." + __env.config.dynamoRegion + ".amazonaws.com",
 		});
@@ -313,7 +250,8 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 		        'score': __env.config.curationQandA.answers[option],
 		        'chrom': $scope.images[$scope.currentImageIdx]['chr'],
 		        'start': $scope.images[$scope.currentImageIdx]['start'],
-		        'end': $scope.images[$scope.currentImageIdx]['end']
+		        'end': $scope.images[$scope.currentImageIdx]['end'],
+		        'additionalCuration' : $scope.additionalCurationResponses
 		    }
 		};
 		docClient.put(params, function(err, data) {
@@ -376,6 +314,8 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	};
 
 	$scope.submit = function() {
+		var element = angular.element( document.querySelector( '#failedAuth' ) );
+		element.addClass('hidden');
 		if ($scope.email != '' && $scope.password != '') {
 			init();
 		}

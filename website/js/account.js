@@ -17,6 +17,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	$scope.deletingAccount = false;
 	$scope.newUserEmails = ['','',''];
 	$scope.newUsers = [];
+	$scope.confirming = false;
 	AWSCognito.config.apiVersions = {
 		cognitoidentityserviceprovider: '2016-04-18'
 	};
@@ -28,6 +29,9 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	var authenticationResult;
 	var userPool;
 	var cognitoUser;
+	var defaultPassword = "Password1@";
+
+
 
 	var init = function() {
 		// Sign user in (depends on pool object) and store token
@@ -37,54 +41,61 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 		    ClientId : clientID 
 		});
 
-		var authenticationData = {
-	        Username : $scope.email, 
-	        Password :  $scope.password
-	    };
-	    var userData = {
-		    Username : $scope.email,
-		    Pool : userPool
-		};
+		if ($scope.confirming) {
+	       	var forceAliasCreation = true;
+        	userPool.client.makeUnauthenticatedRequest('confirmSignUp', {
+				ClientId: userPool.getClientId(),
+				ConfirmationCode: $scope.password,
+				Username: $scope.email,
+				ForceAliasCreation: forceAliasCreation,
+			}, 
+			err => {
+				if (err) {
+					console.log(err);
+		        	var element = angular.element( document.querySelector( '#failedAuth' ) );
+					element.removeClass('hidden');
+				}
+				else {
+					alert("Account confirmed. Please begin by setting your password or you will lose access.");
+					$scope.password = defaultPassword;
+					$scope.confirming = false;
+					init();
+				}
+			});
+		}
+		else {	
+				var authenticationData = {
+		        Username : $scope.email, 
+		        Password :  $scope.password
+		    };
+		    var userData = {
+			    Username : $scope.email,
+			    Pool : userPool
+			};
 
-	    var authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
-	    cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
-		cognitoUser.authenticateUser(authenticationDetails, {
-	        onSuccess: function (result) {
-	        	authenticationResult = result;
-	        	$scope.authenticated = true;
-	        	$scope.$apply();
-	        }, 
-	        onFailure: function(err) {
-	        	var forceAliasCreation = true;
-	        	userPool.client.makeUnauthenticatedRequest('confirmSignUp', {
-					ClientId: userPool.getClientId(),
-					ConfirmationCode: $scope.password,
-					Username: $scope.email,
-					ForceAliasCreation: forceAliasCreation,
-				}, 
-				err => {
-					if (err) {
-						alert("Failed to authenticate: invalid email, password, or confirmation code");
-					}
-					else {					
-						authenticationData['Password'] = "Password1@";
-						authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
-						cognitoUser.authenticateUser(authenticationDetails, {
-					        onSuccess: function (result) {
-					        	authenticationResult = result;
-					        	$scope.authenticated = true;
-					        	$scope.$apply();
-					        	alert("Welcome to PlotCritic! Please begin by changing your password (on account page)");
-					        }, 
-					        onFailure: function(err) {
-					        	alert(err);
-					        }
-					    });
-					}
-				});
-	        }
-    	});
+		    var authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
+		    cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+			cognitoUser.authenticateUser(authenticationDetails, {
+		        onSuccess: function (result) {
+		        	authenticationResult = result;
+		        	$scope.authenticated = true;
+		        	$scope.$apply();
+		        }, 
+		        onFailure: function(err) {
+		        	console.log(err);
+		        	var element = angular.element( document.querySelector( '#failedAuth' ) );
+					element.removeClass('hidden');
+		        }
+	    	});
+		}
 	};
+
+
+
+
+
+
+	 
 
 	$scope.addNewField = function () {
 		$scope.newUserEmails.push('');
@@ -101,7 +112,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 				};
 				var attributeEmail = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute(dataEmail);
 				attributeList.push(attributeEmail);
-				userPool.signUp(newUserEmail, "Password1@", attributeList, null, function(err, newUserresult){
+				userPool.signUp(newUserEmail, defaultPassword, attributeList, null, function(err, newUserresult){
 				    if (err) {
 				        $scope.newUsers.push('Failed to add new user: `' + newUserEmail +'` with error: "' + Object.values(err)[0] +'"');
 				    }
@@ -138,7 +149,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 			alert ("Mismatched passwords");
 			return;
 		}
-		if ($scope.newPassword1 === "Password1@") {
+		if ($scope.newPassword1 === defaultPassword) {
 			alert ("Invalid/insecure password");
 			return;
 		}
@@ -148,7 +159,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 		}
 		cognitoUser.changePassword($scope.password, $scope.newPassword1, function(err, result) {
 	        if (err) {
-	        	cognitoUser.changePassword("Password1@", $scope.newPassword1, function(err, result) {
+	        	cognitoUser.changePassword(defaultPassword, $scope.newPassword1, function(err, result) {
 	        		if (err) {
 	        			alert("Failed to update password. You may have exceeded your attempt limit for now.");
 		            	console.log(err);

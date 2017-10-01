@@ -76,6 +76,8 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
     		}
     	}
     	$scope.records = Object.values(summary_data);
+    	$scope.authenticated = true;
+    	$scope.hide = true;
     	$scope.$apply();
 	};
 
@@ -118,7 +120,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 		batchScan(params);
 	};
 
-	var init = function() {
+	var init = function () {
 		// Sign user in (depends on pool object) and store token
 		//***************************************************************************
 		userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool({
@@ -138,15 +140,14 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	    var authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
 	    var logins = {};
 	    cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+    	AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+		    IdentityPoolId: identityPoolId,
+		    Logins: logins
+		});	
 		cognitoUser.authenticateUser(authenticationDetails, {
 	        onSuccess: function (result) {
 	        	authenticationResult = result;
-	        	$scope.authenticated = true;
 	        	logins['cognito-idp.'+__env.config.region+'.amazonaws.com/'+userPoolId] = result.getIdToken().getJwtToken();
-	        	AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-				    IdentityPoolId: identityPoolId,
-				    Logins: logins
-				});				 
 				AWS.config.credentials.get(function(err){
 				    if (err) {
 				        alert(err);
@@ -155,43 +156,9 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	        	loadReport();
 	        }, 
 	        onFailure: function(err) {
-	        	var forceAliasCreation = true;
-	        	userPool.client.makeUnauthenticatedRequest('confirmSignUp', {
-					ClientId: userPool.getClientId(),
-					ConfirmationCode: $scope.password,
-					Username: $scope.email,
-					ForceAliasCreation: forceAliasCreation,
-				}, 
-				err => {
-					if (err) {
-						alert("Failed to authenticate: invalid email, password, or confirmation code");
-					}
-					else {					
-						authenticationData['Password'] = "Password1@";
-						authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
-						cognitoUser.authenticateUser(authenticationDetails, {
-					        onSuccess: function (result) {
-					        	authenticationResult = result;
-					        	$scope.authenticated = true;
-					        	logins['cognito-idp.'+__env.config.region+'.amazonaws.com/'+userPoolId] = result.getIdToken().getJwtToken();
-					        	AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-								    IdentityPoolId: identityPoolId,
-								    Logins: logins
-								});				 
-								AWS.config.credentials.get(function(err){
-								    if (err) {
-								        alert(err);
-								    }
-								});					        	
-					        	alert("Welcome to PlotCritic! Please begin by changing your password (on account page)");
-					        	loadReport();
-					        }, 
-					        onFailure: function(err) {
-					        	alert(err);
-					        }
-					    });
-					}
-				});
+	        	console.log(err);
+	        	var element = angular.element( document.querySelector( '#failedAuth' ) );
+				element.removeClass('hidden');	    
 	        }
     	});
 	};
@@ -201,9 +168,10 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	};
 
 	$scope.submit = function() {
+		var element = angular.element( document.querySelector( '#failedAuth' ) );
+		element.addClass('hidden');
 		if ($scope.email != '') {
 			init(false);
-			$scope.hide = true;
 		}
 	};
 });

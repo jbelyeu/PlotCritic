@@ -30,12 +30,16 @@
 			 	<br>
 			 	<label for="pass">Password <span style="font-size: 10px;"> (or confirmation code)</span></label>
 			 	<input type="password" ng-model="password" name="pass" required/>
+			 	<input type="checkbox" ng-model="confirming" name="confCode" value="true"> Confirming new account
 			 	<br>
-			 	<input type="submit" id="submit" value="Submit"/>
+			 	<input type="submit" id="submit" value="Submit"/>  
 			</form>
 			<p class='disclaimer'>Your email address will not be used to send unsolicited messages.</p>
+			<div id="failedAuth" class="hidden">
+				<p>Error: Invalid password or username</p>
+				<p>If you are logging in with a confirmation code instead of a password, make sure to check the "Confirming new account" button.</p>
+			</div>	
 		</div>
-		
 		
 		<div class="userEmail" ng-show="authenticated">
 			<p>{{email}}</p>
@@ -65,8 +69,6 @@
 					 	<input type="submit" id="submit" class="changePasswordBtn" value="Submit changed password"/>					 	
 					</form>
 					<button ng-click="changingPassword=false" class="cancelBtn" ng-show=changingPassword>Cancel</button>
-
-            		
         		</div>
 
         		<div class="addUsers accountDiv">            		
