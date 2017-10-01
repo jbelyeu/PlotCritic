@@ -22,7 +22,6 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 
 	$scope.email = '';
 	$scope.password = '';
-	// $scope.scripts = [];
 	$scope.images = [];
 	$scope.currentImageIdx = 0;
 	$scope.goodButton = ["good_button"];
@@ -59,8 +58,13 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
     $rootScope.$on('keypress', function (evt, obj, key) {
         $scope.$apply(function () {
         	if ($scope.images.length > 0) {
-        		$scope.sendScore($scope.curationAnswers[key]);
-        	}            
+        		var option = '';
+        		for (idx in $scope.curationAnswers) {
+        			if ($scope.curationAnswers[idx][0] == key) {
+        				$scope.sendScore(key);
+        			}
+        		}
+        	}
         });
     })
 
@@ -227,9 +231,8 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	};
 
 	$scope.sendScore = function(option) {
-		console.log($scope.additionalCurationResponses);
-    	$scope.next();
-
+        console.log(option);
+        console.log(__env.config.curationQandA.answers[option]);
 		AWS.config.update({
 			endpoint: "https://dynamodb." + __env.config.dynamoRegion + ".amazonaws.com",
 		});
