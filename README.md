@@ -21,8 +21,7 @@ python plotcritic_setup.py \
 ```
 You will receive an email with the URL for your new website, with a confirmation code to log in.
 
-3. Upload images to S3
-If using PlotCritic as part of the [SV-Plaudit](https://github.com/jbelyeu/SV-Plaudit) pipeline, refer to that repository for upload instructions.
+3. Upload images to S3. If using PlotCritic as part of the [SV-Plaudit](https://github.com/jbelyeu/SV-Plaudit) pipeline, refer to that repository for upload instructions.
 
 
 
