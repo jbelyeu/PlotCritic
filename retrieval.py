@@ -5,6 +5,7 @@ from boto3.dynamodb.conditions import Key, Attr
 from botocore.exceptions import ClientError
 import json
 import argparse
+import os
 
 def key_val(arg):
     return [str(x) for x in arg.split(',')]
@@ -36,13 +37,14 @@ try:
         config_data = json.load(config_file)
 except:
     print ("Error: missing configuration file: " + conf_filename)
+endpoint = "https://dynamodb." + config_data['region']+ ".amazonaws.com" 
 dynamodb = boto3.resource('dynamodb', 
     region_name=config_data['region'], 
-    endpoint_url=config_data['dynamoEndpoint'],
+    endpoint_url=endpoint,
     aws_access_key_id=config_data['accessKey'], 
     aws_secret_access_key=config_data['secretAccessKey']
 )
-sveee_table = dynamodb.Table(config_data['dynamoTable'])
+sveee_table = dynamodb.Table(config_data['dynamoScoresTable'])
 response_items = []
 try:
     response = sveee_table.scan()
@@ -53,6 +55,13 @@ try:
 except ClientError as e:
     print (e.response['Error']['Message'])
 else:
+    question = config_data['curationQandA']['question']
+    answers = []
+    for answer in config_data['curationQandA']['answers']:
+        answers.append(config_data['curationQandA']['answers'][answer])
+    print ("#Q:" + question)
+    print ("#A:" + "\t".join(answers))
+
     header_fields = ["BUCKET","EMAIL","IMAGE", "SCORE", "LOADTIME", "RESPONSETIME", "PROJECT", "IDENTIFIER"]
     print ("#" + "\t".join(header_fields))
 
@@ -66,7 +75,7 @@ else:
         if not skip:
             try:
                 print ("\t".join([entry['bucket'],entry['email'],entry['image'],str(entry['score']),
-                    str(entry['load_time']), str(entry['response_time']), entry['project'], entry['identifier']]))
+                    str(entry['load_time']), str(entry['response_time']), entry['project']]))
             except:
                 if args.verbose:
                     print("Error printing entry: " + str(entry), file=sys.stderr)
