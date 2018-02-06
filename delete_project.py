@@ -19,14 +19,10 @@ parser.add_argument('-f', "--full-delete",
     required=False,
     action='store_true'
 )
+parser.add_argument('-c', "--config", help="configuration file from `setup.py`", required=True)
 args = parser.parse_args()
-rel_path = os.path.dirname(sys.argv[0])
-try:
-    with open(os.path.join(rel_path,'config.json'), 'r') as config_file:
-        config_data = json.load(config_file)
-except:
-    print ("Error: missing configuration file " + os.path.join(rel_path,'config.json'))
-    sys.exit(1)
+with open(os.path.join(args.config), 'r') as config_file:
+    config_data = json.load(config_file)
 
 if args.full_delete:
     confirmation = input("Are you sure you want to delete project `" + 

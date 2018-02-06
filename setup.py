@@ -52,7 +52,7 @@ try:
     bucket_endpoint = "http://"+ bucket_name + ".s3-website-us-east-1.amazonaws.com"
 except Exception as e:
     print ("Error: Failed to create S3 bucket. Exiting setup")
-    print (e)
+    print (type(e))
     sys.exit(1)
 
 #create dynamoDB img table (named {project}_img_metadata)
@@ -83,6 +83,14 @@ try:
             'WriteCapacityUnits': 5
         },
     )
+except dynamodb_client.exceptions.ResourceInUseException as e:
+    print ("Error: A DynamoDB table already exists with the name " + args.project + "_img_metadata" + 
+            ", generated for project name " + args.project + ".")
+    print ("You may wish to change the name of this project (by changing the -p flag) to avoid overwriting a previous project.\n")
+    print ("If you would rather remove the current project named " + args.project + 
+            " you may do so using the AWS Console or with the `delete_project` script, using the config.json file created during setup.")
+    print ("Ex. `python sv_plaudit/PlotCritic/delete_project.py -c sv_plaudit/PlotCritic/config.json -f`")
+    sys.exit(1)
 except Exception as e:
     print ("Error: Failed to create DynamoDB table. Exiting setup")
     print (e)
@@ -111,6 +119,14 @@ try:
             'WriteCapacityUnits': 5
         },
     )
+except dynamodb_client.exceptions.ResourceInUseException as e:
+    print ("Error: A DynamoDB table already exists with the name " + args.project + "_scores" + 
+            ", generated for project name " + args.project + ".")
+    print ("You may wish to change the name of this project (by changing the -p flag) to avoid overwriting a previous project.\n")
+    print ("If you would rather remove the current project named " + args.project + 
+            " you may do so using the AWS Console or with the `delete_project` script, using the config.json file created during setup.")
+    print ("Ex. `python sv_plaudit/PlotCritic/delete_project.py -c sv_plaudit/PlotCritic/config.json -f`")
+    sys.exit(1)
 except Exception as e:
     print ("Error: Failed to create DynamoDB table. Exiting setup")
     print (e)
@@ -155,6 +171,14 @@ try:
     user_pool_id = user_pool_response['UserPool']['Id']
     user_pool_region = user_pool_id.split("_")[0]
     user_pool_provider_name = "cognito-idp." + user_pool_region + ".amazonaws.com/" + user_pool_id
+except dynamodb_client.exceptions.ResourceInUseException as e:
+    print ("Error: A User Pool already exists with the name " + args.project + 'PlotCriticPool' + 
+            ", generated for project name " + args.project + ".")
+    print ("You may wish to change the name of this project (by changing the -p flag) to avoid overwriting a previous project.\n")
+    print ("If you would rather remove the current project named " + args.project + 
+            " you may do so using the AWS Console or with the `delete_project` script, using the config.json file created during setup.")
+    print ("Ex. `python sv_plaudit/PlotCritic/delete_project.py -c sv_plaudit/PlotCritic/config.json -f`")
+    sys.exit(1)
 except Exception as e:
     print ("Error: Failed to create User Pool. Exiting setup")
     print (e)
@@ -190,6 +214,14 @@ try:
             }
         ]
     )
+except dynamodb_client.exceptions.ResourceInUseException as e:
+    print ("Error: A User Pool already exists with the name " + args.project + 'PlotCriticPool' + 
+            ", generated for project name " + args.project + ".")
+    print ("You may wish to change the name of this project (by changing the -p flag) to avoid overwriting a previous project.\n")
+    print ("If you would rather remove the current project named " + args.project + 
+            " you may do so using the AWS Console or with the `delete_project` script, using the config.json file created during setup.")
+    print ("Ex. `python sv_plaudit/PlotCritic/delete_project.py -c sv_plaudit/PlotCritic/config.json -f`")
+    sys.exit(1)
 except Exception as e:
     print ("Error: Failed to create Identity Pool. Exiting setup")
     print (e)
