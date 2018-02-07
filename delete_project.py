@@ -8,8 +8,9 @@ import argparse
 import boto3
 import yaml
 
-try: input = input
-except NameError: pass
+if sys.version_info <= (3,0):
+    try: input = raw_input
+    except NameError: pass
 
 parser = argparse.ArgumentParser(description="Delete a PlotCritic project. "+
         "Gets info from the `config.json` file created during setup")
