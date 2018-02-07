@@ -7,6 +7,16 @@ import json
 import argparse
 import boto3
 
+def key_val(arg):
+    return [str(x) for x in arg.split(',')]
+
+default_question = "Does the top sample support the variant type shown? If so, does it appear to be a de novo mutation? Choose one answer from below or type the corresponding letter key."
+default_answers = {
+    "s" : "Supports",
+    "n" : "Does not support",
+    "d" : "De novo"
+}
+
 parser = argparse.ArgumentParser(description="Set up a PlotCritic Project")
 parser.add_argument('-p', "--project", 
     help="Unique name for the project",
@@ -24,7 +34,38 @@ parser.add_argument('-e', "--email",
     help="Admin user email address",
     required=True
 )
+parser.add_argument('-q', "--curation_question", 
+    help="The curation question to show in the PlotCritic website. Default: " + default_question
+)
+parser.add_argument('-A', "--curation_answers", 
+    help="comma-separated key,values pairs of 1-letter codes and associated " + 
+    "curation answers for the curation question (i.e: 'key1','value1' 'key2','value2'). " +
+    'Default (based on default question): "s","Supports" "n","Does not support" "d","De novo"',
+    type=key_val, 
+    nargs="+"
+)
+
+curation_question = ''
+curation_answers = {}
 args = parser.parse_args()
+if args.curation_answers and args.curation_question:
+    ## check answer codes
+    for k,val in args.curation_answers:
+        if len(k) != 1:
+            print ("\nError: curation answers must have a 1-letter code\n")
+            parser.print_help()
+            sys.exit(1)
+        else:
+            curation_answers[k] = val
+    curation_question = args.curation_question
+elif args.curation_answers or args.curation_question:
+    print ("\nError: if curation question or curation answer arguments are set, both must be\n")
+    parser.print_help()
+    sys.exit(1)
+else:
+    ##they set neither, so set defaults
+    curation_question = default_question
+    curation_answers = default_answers
 
 #create AWS S3 bucket set up as web server with folder named after the project for images
 ###################################################################################
@@ -329,12 +370,8 @@ try:
         "clientID" : user_pool_client_response['UserPoolClient']['ClientId'],
         "identityPoolId" : identity_pool_response['IdentityPoolId'],
         "curationQandA" : {
-                "question": "Does the top sample support the variant type shown? If so, does it appear to be a de novo mutation? Choose one answer from below or type the corresponding letter key.",
-                "answers" : {
-                        "s" : "Supports",
-                        "n" : "Does not support",
-                        "d" : "De novo"
-                }
+                "question": curation_question,
+                "answers" : curation_answers
         },
         "reportFields" : [
                 "chrom", 'start', 'end'
