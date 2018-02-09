@@ -45,7 +45,7 @@ parser.add_argument('-A', "--curation_answers",
     nargs="+"
 )
 
-parser.add_argument('r', "--randomize",
+parser.add_argument('-r', "--randomize",
     help="randomize the order in which images are shown to curating scorers",
     action="store_true")
 
