@@ -103,7 +103,25 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 			    				filteredImages.push(imgItem);
 			    			}
 			    		});
-			    		shuffleArray(filteredImages);
+
+			    		if (__env.config.randomizeOrder) {
+			    			$scope.images = shuffleArray(filteredImages);
+			    		}
+			    		else {
+			    			$scope.images = filteredImages;
+			    		}
+			    		
+					    resetCurrent(0);
+				    	if ($scope.images.length > 0) {
+							$scope.hide = true;
+
+							element = angular.element( document.querySelector( '#allScored' ) );
+							element.addClass('hidden');
+						}
+						else {
+							element = angular.element( document.querySelector( '#allScored' ) );
+							element.removeClass('hidden');
+						}		
 			    	}
 			    }
 			});
@@ -206,18 +224,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	        arr[i] = arr[j];
 	        arr[j] = temp;
 	    }
-	    $scope.images = arr;
-	    resetCurrent(0);
-    	if ($scope.images.length > 0) {
-			$scope.hide = true;
-
-			element = angular.element( document.querySelector( '#allScored' ) );
-			element.addClass('hidden');
-		}
-		else {
-			element = angular.element( document.querySelector( '#allScored' ) );
-			element.removeClass('hidden');
-		}		
+	    return arr;
 	};
 
 	var resetCurrent = function (change) {
@@ -231,8 +238,6 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	};
 
 	$scope.sendScore = function(option) {
-        console.log(option);
-        console.log(__env.config.curationQandA.answers[option]);
 		AWS.config.update({
 			endpoint: "https://dynamodb." + __env.config.dynamoRegion + ".amazonaws.com",
 		});
@@ -276,6 +281,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 		}
 		else {
 			$scope.reachedStart = true;
+			$scope.$apply();
 		}
 	};
 
@@ -288,6 +294,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 		}
 		else {
 			$scope.reachedEnd = true;
+			$scope.$apply();
 		}
 	};
 

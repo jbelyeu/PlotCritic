@@ -45,6 +45,10 @@ parser.add_argument('-A', "--curation_answers",
     nargs="+"
 )
 
+parser.add_argument('r', "--randomize",
+    help="randomize the order in which images are shown to curating scorers",
+    action="store_true")
+
 curation_question = ''
 curation_answers = {}
 args = parser.parse_args()
@@ -369,6 +373,7 @@ try:
         "userPoolId" : user_pool_id,
         "clientID" : user_pool_client_response['UserPoolClient']['ClientId'],
         "identityPoolId" : identity_pool_response['IdentityPoolId'],
+        "randomizeOrder" : args.randomize,
         "curationQandA" : {
                 "question": curation_question,
                 "answers" : curation_answers
