@@ -71,14 +71,13 @@ Answers:
 
 You will receive an email with the URL for your new website, with a confirmation code to log in. This script creates a configuration file `config.json` within the PlotCritic directory that later scripts require.
 
-## Uploading images
+## Uploading images (Under development)
 Upload images from a directory on your local machine to S3. Uses `config.json`, which was created by the `PlotCritic/setup.py` script.
 ```
 python upload.py -d [your_directory] -c [config_file]
 ```
 
-## Score images
-This section is still under development
+## Score images (under development)
 
 ## Retrieve scores and analyze results
 The `retrieval.py` script retrieves data from the DynamoDB table and prints it out as tab-separated lines, allowing you to create custom reports. Uses `config.json`. Results are stored in a tab-separated file.
