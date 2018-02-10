@@ -8,7 +8,7 @@ import argparse
 import boto3
 
 def key_val(arg):
-    return [str(x) for x in arg.split(',')]
+    return [str(x) for x in arg.split(':')]
 
 default_question = "Does the top sample support the variant type shown? If so, does it appear to be a de novo mutation? Choose one answer from below or type the corresponding letter key."
 default_answers = {
@@ -16,6 +16,9 @@ default_answers = {
     "n" : "Does not support",
     "d" : "De novo"
 }
+default_report_fields = [
+                "chrom", 'start', 'end'
+        ]
 
 parser = argparse.ArgumentParser(description="Set up a PlotCritic Project")
 parser.add_argument('-p', "--project", 
@@ -34,24 +37,32 @@ parser.add_argument('-e', "--email",
     help="Admin user email address",
     required=True
 )
+parser.add_argument('-r', "--randomize",
+    help="randomize the order in which images are shown to curating scorers",
+    action="store_true"
+)
 parser.add_argument('-q', "--curation_question", 
     help="The curation question to show in the PlotCritic website. Default: " + default_question
 )
 parser.add_argument('-A', "--curation_answers", 
-    help="comma-separated key,values pairs of 1-letter codes and associated " + 
+    help="colon-separated key,values pairs of 1-letter codes and associated " + 
     "curation answers for the curation question (i.e: 'key1','value1' 'key2','value2'). " +
-    'Default (based on default question): "s","Supports" "n","Does not support" "d","De novo"',
+    'Default (based on default question): "s":"Supports" "n":"Does not support" "d":"De novo"',
     type=key_val, 
     nargs="+"
 )
-
-parser.add_argument('-r', "--randomize",
-    help="randomize the order in which images are shown to curating scorers",
-    action="store_true")
+parser.add_argument('-R', "--report_fields",
+    help="space-separated list of fields about the image, for sample identification and additional information. " + 
+    "Default values (based on the genomic structural variant scoring) are: " + ", ".join(default_report_fields),
+    nargs="+",
+    default=default_report_fields
+)
 
 curation_question = ''
 curation_answers = {}
 args = parser.parse_args()
+print (args.curation_answers)
+sys.exit()
 if args.curation_answers and args.curation_question:
     ## check answer codes
     for k,val in args.curation_answers:
@@ -378,9 +389,7 @@ try:
                 "question": curation_question,
                 "answers" : curation_answers
         },
-        "reportFields" : [
-                "chrom", 'start', 'end'
-        ]}
+        "reportFields" : args.report_fields}
     env_footer = "}(this));"
     rel_path = os.path.dirname(sys.argv[0])
     with open(os.path.join(rel_path,"website/js/env.js"), 'w') as env_file:
