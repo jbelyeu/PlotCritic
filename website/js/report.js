@@ -15,15 +15,22 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	$scope.password = '';
 	$scope.authenticated = false;
 	$scope.records = [];
-	$scope.header = ["Project", "Chrom", "Start", "End", "Good", "Bad", "De_novo", "Total_Scores"];
+	var summaryFields = Object.values(__env.config.summaryFields);
 	$scope.hide = false;
 	$scope.orderByField = 'Project';
  	$scope.reverseSort = false;
  	$scope.project = __env.config.projectName;
  	$scope.curationAnswers = [];
+ 	$scope.curationAnswerKeys = []
+ 	$scope.header = summaryFields;
+
  	for (key in __env.config.curationQandA.answers) {
-		$scope.curationAnswers.push([key, __env.config.curationQandA.answers[key]]);
+ 		$scope.curationAnswerKeys.push(key);
+		$scope.curationAnswers.push(__env.config.curationQandA.answers[key]);
+		$scope.header.push(__env.config.curationQandA.answers[key]);
 	}
+	$scope.header.push("Total Scores");
+
  	AWSCognito.config.apiVersions = {
 		cognitoidentityserviceprovider: '2016-04-18'
 	};
@@ -32,48 +39,43 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	var userPoolId =  __env.config.userPoolId;
 	var clientID = __env.config.clientID;
 	var identityPoolId = __env.config.identityPoolId;
+	var summaryFields = Object.values(__env.config.summaryFields);
 	var authenticationResult;
 	var userPool;
 	var cognitoUser;
 
 	var showReport = function(rawData) {
 
+		//should hold the image url, the summary fields, the number of scores for each answer (as a percent of total)
     	summary_data = {};
     	rawData.forEach(function (score_item) {
     		var img_url = score_item['image'];
-    		score_item['chrom'] = score_item['chrom'].replace("chr", "");
-    		if (! isNaN(parseInt(score_item['chrom'])) ) {
-    			score_item['chrom'] = parseInt(score_item['chrom']);
-    		}
-    		if (! (img_url in summary_data)) {
-    			summary_data[img_url] = {
-	    			'Project' 		: score_item['project'],
-	    			'Chrom' 		: score_item['chrom'],
-	    			'Start' 		: parseInt(score_item['start']),
-	    			'End'			: parseInt(score_item['end']),
-	    			'Total_Scores' 	: 0
-	    		};
-	    		for (var idx in $scope.curationAnswers) {
-	    			var curationAnswer = $scope.curationAnswers[idx];
-	    			summary_data[img_url][curationAnswer[0]] = 0;
-	    		}
 
+    		if (! (img_url in summary_data)) {
+
+    			summary_data[img_url] = [];
+	    		for (var i = 0; i < summaryFields.length; ++i ) {
+	    			summary_data[img_url].push(score_item[summaryFields[i]]);
+	    		}
+	    		for (var i = 0; i <= $scope.curationAnswers.length; ++i) {
+	    			summary_data[img_url].push(0);
+	    		}
     		}
+
     		for (var idx in $scope.curationAnswers) {
-	    		var curationAnswer = $scope.curationAnswers[idx];
-    			if (score_item['score'] === curationAnswer[1]) {
-    				summary_data[img_url][curationAnswer[0]] += 1.0;
+    			if (score_item['score'] === $scope.curationAnswers[idx]) {
+    				summary_data[img_url][summaryFields.length + parseInt(idx)] += 1.0;
     			}
     		}
-    		summary_data[img_url]['Total_Scores'] += 1.0;
+    		summary_data[img_url][summary_data[img_url].length-1] += 1.0;
     	});
 
     	for (var img in summary_data) {
-    		for (var idx in $scope.curationAnswers) {
-	    		var curationAnswer = $scope.curationAnswers[idx];
-    			summary_data[img][curationAnswer[0]] = (summary_data[img][curationAnswer[0]] / summary_data[img]['Total_Scores']);
+    		for (var answerIDX = summaryFields.length; answerIDX < summary_data[img].length; ++answerIDX) {
+    			summary_data[img][answerIDX] = parseFloat(summary_data[img][answerIDX]) / parseFloat(summary_data[img][summary_data[img].length-1]);
     		}
     	}
+
     	$scope.records = Object.values(summary_data);
     	$scope.authenticated = true;
     	$scope.hide = true;
