@@ -61,8 +61,6 @@ parser.add_argument('-R', "--report_fields",
 curation_question = ''
 curation_answers = {}
 args = parser.parse_args()
-print (args.curation_answers)
-sys.exit()
 if args.curation_answers and args.curation_question:
     ## check answer codes
     for k,val in args.curation_answers:

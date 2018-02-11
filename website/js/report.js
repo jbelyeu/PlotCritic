@@ -20,7 +20,6 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	$scope.orderByField = 'Project';
  	$scope.reverseSort = false;
  	$scope.project = __env.config.projectName;
- 	$scope.reportFields = __env.config.reportFields;
  	$scope.curationAnswers = [];
  	for (key in __env.config.curationQandA.answers) {
 		$scope.curationAnswers.push([key, __env.config.curationQandA.answers[key]]);
