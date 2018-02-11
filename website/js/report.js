@@ -17,8 +17,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	$scope.records = [];
 	var summaryFields = Object.values(__env.config.summaryFields);
 	$scope.hide = false;
-	$scope.orderByField = 'Project';
- 	$scope.reverseSort = false;
+	$scope.orderByIdx = 0;
  	$scope.project = __env.config.projectName;
  	$scope.curationAnswers = [];
  	$scope.curationAnswerKeys = []
@@ -43,6 +42,25 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	var authenticationResult;
 	var userPool;
 	var cognitoUser;
+	var orderFieldTracker = new Array($scope.header.length).fill(false);
+
+	$scope.reorder = function(index) {
+		$scope.records.sort(function(a, b){
+		    var a1 = a[index];
+		    var b1= b[index];
+		    if (a1 == b1) {
+		    	return 0;
+		    }
+		    return a1> b1? 1: -1;
+		});
+		if (orderFieldTracker[index] == true) {
+			orderFieldTracker[index] = false;
+			$scope.records.reverse();
+		}
+		else {
+			orderFieldTracker[index] = true;
+		}
+	};
 
 	var showReport = function(rawData) {
 
@@ -76,7 +94,8 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
     		}
     	}
 
-    	$scope.records = Object.values(summary_data);
+    	$scope.records = Object.values(summary_data).sort();
+    	orderFieldTracker[0] = true;
     	$scope.authenticated = true;
     	$scope.hide = true;
     	$scope.$apply();

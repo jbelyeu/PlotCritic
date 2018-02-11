@@ -9,6 +9,13 @@ import json
 def key_val(arg):
     return [str(x) for x in arg.split(':')]
 
+def is_number(string):
+    try:
+        int(string)
+        return True
+    except ValueError:
+        return False
+
 parser = argparse.ArgumentParser(description="Creates metadata files in .json format for a directory of image files")
 parser.add_argument("-d", "--images_directory", 
     help="directory containing image files that need metadata",
@@ -60,7 +67,12 @@ with open(args.annotation_file, 'r') as annotation_file:
 for img in annotated_imgs_dict:
     metadata = {}
     for report_field in config_data['reportFields']:
-        metadata[report_field] = annotated_imgs_dict[img][int(report_field_positions[report_field])]
+        report_value = annotated_imgs_dict[img][int(report_field_positions[report_field])]
+        if is_number(report_value):
+            metadata[report_field] = int(report_value)
+        else:
+            metadata[report_field] = report_value
+
     metadata['summaryData'] = config_data['summaryFields']
     meta_filename = os.path.splitext(img)[0]
     with open(os.path.join(args.images_directory,  meta_filename+".json"), 'w') as meta_file:
