@@ -89,7 +89,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
     	});
 
     	for (var img in summary_data) {
-    		for (var answerIDX = summaryFields.length; answerIDX < summary_data[img].length; ++answerIDX) {
+    		for (var answerIDX = summaryFields.length; answerIDX < summary_data[img].length-1; ++answerIDX) {
     			summary_data[img][answerIDX] = parseFloat(summary_data[img][answerIDX]) / parseFloat(summary_data[img][summary_data[img].length-1]);
     		}
     	}
