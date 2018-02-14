@@ -60,7 +60,7 @@ parser.add_argument('-R', "--report_fields",
 parser.add_argument('-S', "--summary_fields",
     help="subset of the report fields that will be shown in the web report after scoring. Space-separated. ",
     nargs="+",
-    required=False
+    required=True
 )
 
 args = parser.parse_args()
