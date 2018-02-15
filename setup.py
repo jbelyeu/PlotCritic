@@ -17,8 +17,18 @@ default_answers = {
     "d" : "De novo"
 }
 default_report_fields = [
-                "chrom", 'start', 'end'
-        ]
+    "chrom", 
+    'start', 
+    'end',
+    'sv_type',
+    'reference',
+    'bams',
+    'titles',
+    'output_file',
+    'transcript_file',
+    'window',
+    'max_depth'
+]
 
 parser = argparse.ArgumentParser(description="Set up a PlotCritic Project")
 parser.add_argument('-p', "--project", 
@@ -68,13 +78,18 @@ curation_question = ''
 curation_answers = {}
 if args.curation_answers and args.curation_question:
     ## check answer codes
-    for k,val in args.curation_answers:
-        if len(k) != 1:
-            print ("\nError: curation answers must have a 1-letter code\n")
-            parser.print_help()
-            sys.exit(1)
-        else:
-            curation_answers[k] = val
+    try:
+        for k,val in args.curation_answers:
+            if len(k) != 1:
+                print ("\nError: curation answers must have a 1-letter code\n")
+                parser.print_help()
+                sys.exit(1)
+            else:
+                curation_answers[k] = val
+    except Exception as e:
+        print (e)
+        parser.print_help()
+        sys.exit(1)
     curation_question = args.curation_question
 elif args.curation_answers or args.curation_question:
     print ("\nError: if curation question or curation answer arguments are set, both must be\n")
