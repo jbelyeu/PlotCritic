@@ -54,6 +54,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	var authenticationResult;
 	var userPool;
 	var cognitoUser;
+	var reportFields = Object.values(__env.config.reportFields);
 
     $rootScope.$on('keypress', function (evt, obj, key) {
         $scope.$apply(function () {
@@ -245,9 +246,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 		var docClient = new AWS.DynamoDB.DocumentClient();
 		var now = Date.now();
 		var imageID = $scope.images[$scope.currentImageIdx]['inc_info'];
-		var params = {
-		    TableName:__env.config.dynamoScoresTable,
-		    Item:{
+		var item = {
 		    	'id': $scope.email + "_" + now,
 		        "email": $scope.email,
 		        'image': imageID,
@@ -255,12 +254,15 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 		        'response_time': now,
 		        'load_time': $scope.load_time,
 		        'project' : __env.config.projectName,
-		        'score': __env.config.curationQandA.answers[option],
-		        'chrom': $scope.images[$scope.currentImageIdx]['chr'],
-		        'start': $scope.images[$scope.currentImageIdx]['start'],
-		        'end': $scope.images[$scope.currentImageIdx]['end'],
-		        'additionalCuration' : $scope.additionalCurationResponses
-		    }
+		        'score': __env.config.curationQandA.answers[option]
+		};
+		for (var i = 0; i < reportFields.length; ++i) {
+			item[reportFields[i]] = $scope.images[$scope.currentImageIdx][reportFields[i]];
+		}
+
+		var params = {
+		    TableName:__env.config.dynamoScoresTable,
+		    Item: item
 		};
 		docClient.put(params, function(err, data) {
 		    if (err) {

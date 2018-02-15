@@ -8,7 +8,7 @@ import argparse
 import boto3
 
 def key_val(arg):
-    return [str(x) for x in arg.split(',')]
+    return [str(x) for x in arg.split(':')]
 
 default_question = "Does the top sample support the variant type shown? If so, does it appear to be a de novo mutation? Choose one answer from below or type the corresponding letter key."
 default_answers = {
@@ -16,6 +16,9 @@ default_answers = {
     "n" : "Does not support",
     "d" : "De novo"
 }
+default_report_fields = [
+                "chrom", 'start', 'end'
+        ]
 
 parser = argparse.ArgumentParser(description="Set up a PlotCritic Project")
 parser.add_argument('-p', "--project", 
@@ -34,24 +37,35 @@ parser.add_argument('-e', "--email",
     help="Admin user email address",
     required=True
 )
+parser.add_argument('-r', "--randomize",
+    help="randomize the order in which images are shown to curating scorers",
+    action="store_true"
+)
 parser.add_argument('-q', "--curation_question", 
     help="The curation question to show in the PlotCritic website. Default: " + default_question
 )
 parser.add_argument('-A', "--curation_answers", 
-    help="comma-separated key,values pairs of 1-letter codes and associated " + 
+    help="colon-separated key,values pairs of 1-letter codes and associated " + 
     "curation answers for the curation question (i.e: 'key1','value1' 'key2','value2'). " +
-    'Default (based on default question): "s","Supports" "n","Does not support" "d","De novo"',
+    'Default (based on default question): "s":"Supports" "n":"Does not support" "d":"De novo"',
     type=key_val, 
     nargs="+"
 )
+parser.add_argument('-R', "--report_fields",
+    help="space-separated list of fields about the image, for sample identification and additional information. " + 
+    "Default values (based on the genomic structural variant scoring) are: " + ", ".join(default_report_fields),
+    nargs="+",
+    default=default_report_fields
+)
+parser.add_argument('-S', "--summary_fields",
+    help="subset of the report fields that will be shown in the web report after scoring. Space-separated. ",
+    nargs="+",
+    required=True
+)
 
-parser.add_argument('-r', "--randomize",
-    help="randomize the order in which images are shown to curating scorers",
-    action="store_true")
-
+args = parser.parse_args()
 curation_question = ''
 curation_answers = {}
-args = parser.parse_args()
 if args.curation_answers and args.curation_question:
     ## check answer codes
     for k,val in args.curation_answers:
@@ -134,7 +148,7 @@ except dynamodb_client.exceptions.ResourceInUseException as e:
     print ("You may wish to change the name of this project (by changing the -p flag) to avoid overwriting a previous project.\n")
     print ("If you would rather remove the current project named " + args.project + 
             " you may do so using the AWS Console or with the `delete_project` script, using the config.json file created during setup.")
-    print ("Ex. `python sv_plaudit/PlotCritic/delete_project.py -c sv_plaudit/PlotCritic/config.json -f`")
+    print ("Ex. `python delete_project.py -c config.json -f`")
     sys.exit(1)
 except Exception as e:
     print ("Error: Failed to create DynamoDB table. Exiting setup")
@@ -364,23 +378,23 @@ except Exception as e:
 try:
     env_header = "(function (window) {window.__env = window.__env || {};window.__env.config = "
     env_obj = {"dynamoRegion" : user_pool_region,
-        "region" : user_pool_region,
-        "dynamoScoresTable" : scores_table_name,
-        "dynamoImagesTable" : img_table_name,
-        "projectName" : args.project,
-        "AWSBucketName" : bucket_name,
-        "AWSBucketURl" : bucket_endpoint,
-        "userPoolId" : user_pool_id,
-        "clientID" : user_pool_client_response['UserPoolClient']['ClientId'],
-        "identityPoolId" : identity_pool_response['IdentityPoolId'],
-        "randomizeOrder" : args.randomize,
-        "curationQandA" : {
-                "question": curation_question,
-                "answers" : curation_answers
-        },
-        "reportFields" : [
-                "chrom", 'start', 'end'
-        ]}
+            "region" : user_pool_region,
+            "dynamoScoresTable" : scores_table_name,
+            "dynamoImagesTable" : img_table_name,
+            "projectName" : args.project,
+            "AWSBucketName" : bucket_name,
+            "AWSBucketURl" : bucket_endpoint,
+            "userPoolId" : user_pool_id,
+            "clientID" : user_pool_client_response['UserPoolClient']['ClientId'],
+            "identityPoolId" : identity_pool_response['IdentityPoolId'],
+            "randomizeOrder" : args.randomize,
+            "curationQandA" : {
+                    "question": curation_question,
+                    "answers" : curation_answers
+            },
+            "reportFields" : args.report_fields,
+            "summaryFields" : args.summary_fields
+        }
     env_footer = "}(this));"
     rel_path = os.path.dirname(sys.argv[0])
     with open(os.path.join(rel_path,"website/js/env.js"), 'w') as env_file:

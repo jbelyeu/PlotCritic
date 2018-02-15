@@ -26,14 +26,11 @@ parser.add_argument("-c","--config",
     dest="config",
     help="Config file for accessing AWS resources. If not included, defaults to " +
         os.path.join(rel_path,'config.json'),
-    required=False)
+    required=True)
 args = parser.parse_args()
 
 try:
-    conf_filename = rel_path+'config.json'
-    if args.config: 
-        conf_filename = args.config 
-    with open(conf_filename, 'r') as config_file:
+    with open(args.config, 'r') as config_file:
         config_data = json.load(config_file)
 except:
     print ("Error: missing configuration file: " + conf_filename)
