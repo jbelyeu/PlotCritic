@@ -73,7 +73,6 @@ for img in annotated_imgs_dict:
         else:
             metadata[report_field] = report_value
 
-    metadata['summaryData'] = config_data['summaryFields']
     meta_filename = os.path.splitext(img)[0]
     with open(os.path.join(args.images_directory,  meta_filename+".json"), 'w') as meta_file:
         json.dump(metadata, meta_file)
