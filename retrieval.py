@@ -10,7 +10,24 @@ import os
 def key_val(arg):
     return [str(x) for x in arg.split(',')]
 
-rel_path = os.path.dirname(sys.argv[0])
+def filter_old_responses(response_items):
+    # dictionary of image names to dictionaries of emails to timestamps
+    most_recent_score_by_email = {}
+    for entry in response_items:
+        img_name = entry['image']
+        email = entry['email']
+        response_time = int(entry['response_time'])
+        if img_name not in most_recent_score_by_email:
+            most_recent_score_by_email[img_name] = {}
+
+        if (email not in most_recent_score_by_email[img_name]) or (response_time > most_recent_score_by_email[img_name][email]):
+            most_recent_score_by_email[img_name][email] = response_time
+    filtered_response_items = []
+    for entry in response_items:
+        if most_recent_score_by_email[entry['image']][entry['email']] == int(entry['response_time']):
+            filtered_response_items.append(entry)
+    return filtered_response_items
+
 parser = argparse.ArgumentParser(
     description="Tool for retrieving entries from the SVeee DynamoDB tables")
 parser.add_argument('-f', "--filters", 
@@ -23,17 +40,17 @@ parser.add_argument('-v', "--verbose",
     required=False,
     action="store_true")
 parser.add_argument("-c","--config",
-    dest="config",
-    help="Config file for accessing AWS resources. If not included, defaults to " +
-        os.path.join(rel_path,'config.json'),
+    help="Config file for accessing AWS resources",
     required=True)
+parser.add_argument("-m", "--most_recent",
+    action="store_true",
+    help="Reports onlythe most recent score from each curator for each image"
+)
 args = parser.parse_args()
 
-try:
-    with open(args.config, 'r') as config_file:
-        config_data = json.load(config_file)
-except:
-    print ("Error: missing configuration file: " + conf_filename)
+with open(args.config, 'r') as config_file:
+    config_data = json.load(config_file)
+
 endpoint = "https://dynamodb." + config_data['region']+ ".amazonaws.com" 
 dynamodb = boto3.resource('dynamodb', 
     region_name=config_data['region'], 
@@ -52,6 +69,9 @@ try:
 except ClientError as e:
     print (e.response['Error']['Message'])
 else:
+    if args.most_recent:
+        response_items = filter_old_responses(response_items)
+
     question = config_data['curationQandA']['question']
     answers = []
     for answer in config_data['curationQandA']['answers']:
@@ -60,6 +80,7 @@ else:
     print ("#A:" + "\t".join(answers))
 
     header_fields = ["BUCKET","EMAIL","IMAGE", "SCORE", "LOADTIME", "RESPONSETIME", "PROJECT", "IDENTIFIER"]
+    header_fields = header_fields + config_data['reportFields']
     print ("#" + "\t".join(header_fields))
 
     for entry in response_items:
@@ -71,8 +92,13 @@ else:
                     continue
         if not skip:
             try:
-                print ("\t".join([entry['bucket'],entry['email'],entry['image'],str(entry['score']),
-                    str(entry['load_time']), str(entry['response_time']), entry['project']]))
-            except:
+                fields_to_show = [entry['bucket'],entry['email'],entry['image'],str(entry['score']),
+                    str(entry['load_time']), str(entry['response_time']), entry['project']]
+                
+                for field in config_data['reportFields']:
+                    fields_to_show.append(entry[field])
+                print ("\t".join(fields_to_show))
+            except Exception as e:
                 if args.verbose:
                     print("Error printing entry: " + str(entry), file=sys.stderr)
+                    print (e, file=sys.stderr)
