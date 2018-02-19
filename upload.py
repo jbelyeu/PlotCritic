@@ -42,7 +42,7 @@ for filename in os.listdir(args.directory):
 for raw_filename in dir_files:
     
     # filter for unmatched files
-    if not dir_files[raw_filename]['args'] and dir_files[raw_filename]['img']:
+    if 'img' in dir_files[raw_filename] and 'args' not in dir_files[raw_filename]:
         print ("Warning: mismatched file with prefix'" + raw_filename + "' found in '" + args.directory + "'")
         continue
 
