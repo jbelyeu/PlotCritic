@@ -96,9 +96,13 @@ else:
                     str(entry['load_time']), str(entry['response_time']), entry['project']]
                 
                 for field in config_data['reportFields']:
-                    fields_to_show.append(entry[field])
+                    if type(entry[field]) == list:
+                        fields_to_show.append(",".join(entry[field]))
+                    else:
+                        fields_to_show.append(entry[field])
                 print ("\t".join(fields_to_show))
             except Exception as e:
+                sys.exit()
                 if args.verbose:
                     print("Error printing entry: " + str(entry), file=sys.stderr)
                     print (e, file=sys.stderr)
