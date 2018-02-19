@@ -69,9 +69,12 @@ dynamodb = boto3.resource('dynamodb',
 imgs_table = dynamodb.Table(config_data['dynamoImagesTable'])
 with imgs_table.batch_writer() as batch:
     for key in sv_args:
+        #skip images without metadata
+        if 'inc_info' not in sv_args[key]:
+            print (key)
+            continue
         sv_args[key]['identifier'] = sv_args[key]['inc_info']
 
         batch.put_item(
             Item = sv_args[key]
         )
-
