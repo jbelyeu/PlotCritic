@@ -72,6 +72,10 @@ parser.add_argument('-S', "--summary_fields",
     nargs="+",
     required=True
 )
+parser.add_argument("--region",
+    help="AWS region",
+    default="us-east-1"
+)
 
 args = parser.parse_args()
 curation_question = ''
@@ -106,7 +110,9 @@ try:
     bucket_name = args.project.replace("_", "-").lower() + "-plotcritic-bucket"
     s3_client = boto3.client('s3',
         aws_access_key_id=args.access_key_id,
-        aws_secret_access_key=args.secret_access_key
+        aws_secret_access_key=args.secret_access_key,
+        api_version='2006-03-01',
+        region_name=args.region
     )
     s3_create_bucket_response = s3_client.create_bucket(
         ACL='public-read',
@@ -131,13 +137,15 @@ except Exception as e:
 
 #create dynamoDB img table (named {project}_img_metadata)
 ###################################################################################
-try:
-    img_table_name =  args.project + "_img_metadata"
-    dynamodb_client = boto3.client('dynamodb',
-        aws_access_key_id=args.access_key_id,
-        aws_secret_access_key=args.secret_access_key
-    )
+img_table_name =  args.project + "_img_metadata"
+dynamodb_client = boto3.client('dynamodb',
+    aws_access_key_id=args.access_key_id,
+    aws_secret_access_key=args.secret_access_key,
+    api_version='2012-08-10',
+    region_name=args.region
+)
 
+try:
     create_img_table_response = dynamodb_client.create_table(
         AttributeDefinitions=[
             {
@@ -211,7 +219,9 @@ except Exception as e:
 try:
     cognito_identity_provider_client = boto3.client('cognito-idp',
         aws_access_key_id=args.access_key_id,
-        aws_secret_access_key=args.secret_access_key
+        aws_secret_access_key=args.secret_access_key,
+        api_version='2016-04-18',
+        region_name=args.region
     )
 
     user_pool_response = cognito_identity_provider_client.create_user_pool(
@@ -231,13 +241,11 @@ try:
         AutoVerifiedAttributes=[
             'email',
         ],
-        VerificationMessageTemplate={
-            'EmailMessage': 'You have been invited to join a PlotCritic project at ' +
+        EmailVerificationMessage='You have been invited to join a PlotCritic project at ' +
             bucket_endpoint + '. This email address is your username. Enter the following ' +
             'confirmation code to gain access and set your own password: {####}.',
-            'EmailSubject': 'PlotCritic Invitation',
-            'DefaultEmailOption': 'CONFIRM_WITH_CODE'
-        },
+        EmailVerificationSubject="PlotCritic Invitation",
+            #'DefaultEmailOption': 'CONFIRM_WITH_CODE'
         AdminCreateUserConfig={
             'AllowAdminCreateUserOnly': False
         },
@@ -276,7 +284,9 @@ except Exception as e:
 try:
     cognito_identity_pool_client = boto3.client('cognito-identity',
         aws_access_key_id=args.access_key_id,
-        aws_secret_access_key=args.secret_access_key
+        aws_secret_access_key=args.secret_access_key,
+        region_name=args.region,
+        api_version='2014-06-30'
     )
     identity_pool_response = cognito_identity_pool_client.create_identity_pool(
         IdentityPoolName=args.project + 'PlotCriticIdentityPool',
@@ -328,7 +338,9 @@ try:
     role_name = args.project + "PlotCriticRole" 
     iam_client = boto3.client('iam',
         aws_access_key_id=args.access_key_id,
-        aws_secret_access_key=args.secret_access_key
+        aws_secret_access_key=args.secret_access_key,
+        api_version="2010-05-08",
+        region_name=args.region
     )
     iam_role_response = iam_client.create_role(
         RoleName=role_name,
@@ -433,7 +445,10 @@ except Exception as e:
 try:
     s3_resource = boto3.resource('s3',
         aws_access_key_id=args.access_key_id,
-        aws_secret_access_key=args.secret_access_key
+        aws_secret_access_key=args.secret_access_key,
+        api_version='2006-03-01',
+        region_name=args.region
+
     )
     for subdir, dirs, files in os.walk(os.path.join(rel_path,"website/")):
         for file_name in files:
