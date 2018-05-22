@@ -29,7 +29,7 @@ def filter_old_responses(response_items):
     return filtered_response_items
 
 parser = argparse.ArgumentParser(
-    description="Tool for retrieving entries from the SVeee DynamoDB tables")
+    description="Tool for retrieving entries from the DynamoDB tables")
 parser.add_argument('-f', "--filters", 
     help="comma-separated key,values pairs of filters for entries to report (i.e: 'key1','value1' 'key2','value2'",
     required=False, 
@@ -44,7 +44,7 @@ parser.add_argument("-c","--config",
     required=True)
 parser.add_argument("-m", "--most_recent",
     action="store_true",
-    help="Reports onlythe most recent score from each curator for each image"
+    help="Reports only the most recent score from each curator for each image"
 )
 args = parser.parse_args()
 
@@ -58,13 +58,13 @@ dynamodb = boto3.resource('dynamodb',
     aws_access_key_id=config_data['accessKey'], 
     aws_secret_access_key=config_data['secretAccessKey']
 )
-sveee_table = dynamodb.Table(config_data['dynamoScoresTable'])
+table = dynamodb.Table(config_data['dynamoScoresTable'])
 response_items = []
 try:
-    response = sveee_table.scan()
+    response = table.scan()
     response_items += response['Items']
     while 'LastEvaluatedKey' in response:
-        response = sveee_table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
+        response = table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
         response_items.extend(response['Items'])
 except ClientError as e:
     print (e.response['Error']['Message'])
@@ -79,7 +79,7 @@ else:
     print ("#Q:" + question)
     print ("#A:" + "\t".join(answers))
 
-    header_fields = ["BUCKET","EMAIL","IMAGE", "SCORE", "LOADTIME", "RESPONSETIME", "PROJECT", "IDENTIFIER"]
+    header_fields = ["BUCKET","EMAIL","IMAGE", "SCORE", "LOADTIME", "RESPONSETIME", "PROJECT"]
     header_fields = header_fields + config_data['reportFields']
     print ("#" + "\t".join(header_fields))
 
