@@ -79,9 +79,10 @@ else:
     print ("#Q:" + question)
     print ("#A:" + "\t".join(answers))
 
-    header_fields = ["BUCKET","EMAIL","IMAGE", "SCORE", "LOADTIME", "RESPONSETIME", "PROJECT"]
+    header_fields = ["EMAIL","IMAGE", "SCORE", "LOADTIME", "RESPONSETIME", "PROJECT"]
     header_fields = header_fields + config_data['reportFields']
     print ("#" + "\t".join(header_fields))
+
 
     for entry in response_items:
         skip = False
@@ -92,7 +93,7 @@ else:
                     continue
         if not skip:
             try:
-                fields_to_show = [entry['bucket'],entry['email'],entry['image'],str(entry['score']),
+                fields_to_show = [entry['email'],entry['image'],str(entry['score']),
                     str(entry['load_time']), str(entry['response_time']), entry['project']]
                 
                 for field in config_data['reportFields']:
@@ -102,7 +103,6 @@ else:
                         fields_to_show.append(entry[field])
                 print ("\t".join(fields_to_show))
             except Exception as e:
-                sys.exit()
                 if args.verbose:
                     print("Error printing entry: " + str(entry), file=sys.stderr)
                     print (e, file=sys.stderr)

@@ -50,11 +50,14 @@ for raw_filename in dir_files:
     
     # filter for unmatched files
     if 'img' in dir_files[raw_filename] and 'args' not in dir_files[raw_filename]:
-        print ("Warning: mismatched file with prefix'" + raw_filename + "' found in '" + args.directory + "'")
+        print ("Warning: mismatched image file with prefix'" + raw_filename + "' found in '" + args.directory + "'")
+        continue
+    if 'img' not in dir_files[raw_filename]:
+        print ("Warning: mismatched config file with prefix'" + raw_filename + "' found in '" + args.directory + "'")
         continue
 
     # upload images or js to S3
-    to_store = args.directory + '/' + dir_files[raw_filename]['img']
+    to_store = os.path.join(args.directory, dir_files[raw_filename]['img'])
     key = config_data['projectName'] + '/' + dir_files[raw_filename]['img']
     transfer.upload_file(
             to_store,

@@ -51,6 +51,7 @@ try:
         bucket = s3_resource.Bucket(config_data['AWSBucketName'])
         bucket.objects.all().delete()
         bucket.delete()
+    print ("S3 bucket deleted")
 except Exception as e:
     print ("Warning: Failed to delete S3 bucket")
     print (e)
@@ -72,6 +73,7 @@ try:
         delete_img_table_response = dynamodb_client.delete_table(
             TableName=config_data['dynamoImagesTable']
         )
+    print ("DynamoDB images table deleted")
 except Exception as e:
     print ("Warning: Failed to delete DynamoDB Table")
     print (e)
@@ -86,6 +88,7 @@ try:
         delete_scores_table_response = dynamodb_client.delete_table(
             TableName=config_data['dynamoScoresTable']
         )
+    print ("DynamoDB scores table deleted")
 except Exception as e:
     print ("Warning: Failed to delete DynamoDB Table")
     print (e)
@@ -106,6 +109,7 @@ try:
         delete_user_pool_response = cognito_identity_provider_client.delete_user_pool(
             UserPoolId=config_data['userPoolId']
         )
+    print ("User Pool deleted")
 except Exception as e:
     print ("Warning: Failed to delete User Pool")
     print (e)
@@ -127,9 +131,11 @@ try:
         delete_identity_pool_response = cognito_identity_pool_client.delete_identity_pool(
             IdentityPoolId=config_data['identityPoolId']
         )
+    print ("Identity Pool deleted")
 except Exception as e:
     print ("Warning: Failed to delete Identity Pool")
     print (e)
+
 
 # delete IAM role
 ######################################################################
@@ -158,9 +164,11 @@ try:
         delete_iam_role_response = iam_client.delete_role(
             RoleName=role_name
         )
+    print ("IAM Role deleted")
 except Exception as e:
-    print ("Warning: Failed to delete Identity Pool")
+    print ("Warning: Failed to delete IAM Role")
     print (e)
 
-print ("Delete operation complete. You should review your AWS account to ensure that "+
-        "all entities were properly removed.")
+print ("\nDelete operation complete. You should review your AWS account to ensure that "+
+        "all entities were properly removed. \n------------------------------------------------\n"+\
+                "Be aware that DynamoDB table deletion frequently requires a few minutes to complete")
