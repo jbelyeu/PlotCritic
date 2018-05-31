@@ -23,6 +23,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
  	$scope.curationAnswerKeys = []
  	$scope.header = summaryFields;
 
+
  	for (key in __env.config.curationQandA.answers) {
  		$scope.curationAnswerKeys.push(key);
 		$scope.curationAnswers.push(__env.config.curationQandA.answers[key]);
@@ -44,6 +45,8 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	var cognitoUser;
 	var orderFieldTracker = new Array($scope.header.length).fill(false);
 
+
+
 	$scope.reorder = function(index) {
 		$scope.records.sort(function(a, b){
 		    var a1 = a[index];
@@ -63,45 +66,115 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	};
 
 	var showReport = function(rawData) {
+		var entryRows = [];
 
 		//should hold the image url, the summary fields, the number of scores for each answer (as a percent of total)
-    	summary_data = {};
+    	summaryData = {};
     	rawData.forEach(function (score_item) {
     		var img_url = score_item['image'];
 
-    		if (! (img_url in summary_data)) {
+    		if (! (img_url in summaryData)) {
 
-    			summary_data[img_url] = [];
+    			summaryData[img_url] = [];
 	    		for (var i = 0; i < summaryFields.length; ++i ) {
-	    			summary_data[img_url].push(score_item[summaryFields[i]]);
+	    			summaryData[img_url].push(score_item[summaryFields[i]]);
 	    		}
 	    		for (var i = 0; i <= $scope.curationAnswers.length; ++i) {
-	    			summary_data[img_url].push(0);
+	    			summaryData[img_url].push(0);
 	    		}
     		}
 
     		for (var idx in $scope.curationAnswers) {
     			if (score_item['score'] === $scope.curationAnswers[idx]) {
-    				summary_data[img_url][summaryFields.length + parseInt(idx)] += 1.0;
+    				summaryData[img_url][summaryFields.length + parseInt(idx)] += 1.0;
     			}
     		}
-    		summary_data[img_url][summary_data[img_url].length-1] += 1.0;
+    		summaryData[img_url][summaryData[img_url].length-1] += 1.0;
+
+    		//store scores for downloadable report
+    		fields_to_show = [score_item['email'],
+    							score_item['image'],
+    							score_item['score'].toString(),
+    							score_item['load_time'].toString(), 
+    							score_item['response_time'].toString(), 
+    							score_item['project']];
+
+    		reportFields = Object.values(__env.config.reportFields);
+     		for (var i=0; i<reportFields.length; ++i) {
+     			field = reportFields[i];
+     			if (typeof score_item[field] == Array){
+     				fields_to_show.push(score_item[field].join(","));
+     			}
+     			else {
+     				fields_to_show.push(score_item[field]);
+     			}
+     		}
+			entryRows.push(fields_to_show.join("\t"));
     	});
 
-    	for (var img in summary_data) {
-    		for (var answerIDX = summaryFields.length; answerIDX < summary_data[img].length-1; ++answerIDX) {
-    			summary_data[img][answerIDX] = ((parseFloat(summary_data[img][answerIDX]) / parseFloat(summary_data[img][summary_data[img].length-1]))*100).toFixed(1);
+    	for (var img in summaryData) {
+    		for (var i = 0; i < summaryFields.length; ++i) {
+    			var valAsInt = parseInt(summaryData[img][i]);
+    			if (!isNaN(valAsInt)) { 
+    				summaryData[img][i] = parseInt(summaryData[img][i]);
+    			}
+    		}
+    		for (var answerIDX = summaryFields.length; answerIDX < summaryData[img].length-1; ++answerIDX) {
+    			summaryData[img][answerIDX] = ((parseFloat(summaryData[img][answerIDX]) / 
+    				parseFloat(summaryData[img][summaryData[img].length-1]))*100).toFixed(1);
     		}
     	}
 
-    	$scope.records = Object.values(summary_data).sort();
+    	$scope.records = Object.values(summaryData).sort();
+
+    	//write tsv file for raw downloadable report
+    	buildRawReport(entryRows);
+
+		//write tsv file for downloadable summary report
+		buildSummaryReport();
+
     	orderFieldTracker[0] = true;
     	$scope.authenticated = true;
     	$scope.hide = true;
     	$scope.$apply();
 	};
 
-	
+	var buildRawReport = function (entryRows) {
+		//write tsv file for raw downloadable report
+    	var rawHeader =  "#Q:" + __env.config.curationQandA.question + "\n";
+    	var answers = [];
+		for (var key in __env.config.curationQandA.answers) {
+			answers.push(__env.config.curationQandA.answers[key]);
+		}
+
+    	rawHeader += "#A:" + answers.join("\t") + "\n";
+    	header_fields = ["EMAIL","IMAGE", "SCORE", "LOADTIME", "RESPONSETIME", "PROJECT"];
+		header_fields = header_fields.concat(Object.values(__env.config.reportFields));
+    	rawHeader += ("#" + header_fields.join("\t"))
+
+    	content = rawHeader +"\n"+ entryRows.join("\n");
+		var rawBlob = new Blob([ content ], { type : 'text/plain' });
+		$scope.rawReport = (window.URL || window.webkitURL).createObjectURL( rawBlob );
+	};
+
+	var buildSummaryReport = function () {
+		var downloadableSummaryHeader = "#Q:" + __env.config.curationQandA.question + "\n";
+		var answers = [];
+		for (var key in __env.config.curationQandA.answers) {
+			answers.push(__env.config.curationQandA.answers[key]);
+		}
+		downloadableSummaryHeader += "#A:" + answers.join("\t") + "\n";
+		downloadableSummaryHeader += $scope.header.join("\t");
+		summaryRows = [];
+		for (var i = 0; i < $scope.records.length; ++i) {
+			summaryRows.push($scope.records[i].join("\t"));
+		}
+
+    	content = downloadableSummaryHeader +"\n"+ summaryRows.join("\n");
+		var summaryBlob = new Blob([ content ], { type : 'text/plain' });
+		$scope.summaryReport = (window.URL || window.webkitURL).createObjectURL( summaryBlob );
+	};
+
 	var loadReport = function () {
 		var rawData = [];
 		var batchScan = function (params) {
@@ -195,3 +268,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 		}
 	};
 });
+app.config(['$compileProvider',
+    function ($compileProvider) {
+        $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|tel|file|blob):/);
+}]);

@@ -72,3 +72,9 @@ a {
     margin: 5px 15px 5px 15px;
     color: black;
 }
+
+.download-link {
+    font-size: 14px;
+    margin: 0px;
+    color: #2196F3;
+}
