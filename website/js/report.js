@@ -187,6 +187,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 			        console.error("Unable to retrieve item. Error JSON:", JSON.stringify(err, null, 2));
 			    }
 			    else {
+			    	//if a person scored an image more than once, remove all but the most recent score
 			    	if (data.Items.length) {
 			    		rawData.push.apply(rawData, data.Items);
 			    	}
@@ -195,7 +196,27 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 			    		batchScan(params);
 			    	}
 			    	else {
-						showReport(rawData);
+			    		scoreTracker = {};
+			    		rawData.forEach(function (scoreItem) {
+			    			if (!(scoreItem['email'] in scoreTracker)) {
+			    				scoreTracker[scoreItem['email']] = {};
+			    			}
+			    			if (! (scoreItem['image'] in scoreTracker[scoreItem['email']])) {
+			    				scoreTracker[scoreItem['email']][scoreItem['image']] = scoreItem;
+			    			}
+			    			else {
+			    				if (scoreTracker[scoreItem['email']][scoreItem['image']]['response_time'] < scoreItem['response_time']) {
+			    					scoreTracker[scoreItem['email']][scoreItem['image']] = scoreItem;
+			    				}
+			    			}
+			    		});
+			    		filteredRawData = [];
+			    		for (var k in scoreTracker) {
+			    			for ( var sk in scoreTracker[k]) {
+			    				filteredRawData.push(scoreTracker[k][sk]);
+			    			}
+			    		}
+						showReport(filteredRawData);
 			    	}			    	
 			    }
 			});
