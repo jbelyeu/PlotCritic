@@ -50,7 +50,7 @@
 		<div ng-show="hide" class=main_frame>
 			<button class="logoutButton" ng-click=reload()>Log out</button>
 			<div class="viewer" >
-				<p>Results for project `{{project}}`. <a class="download-link" download="raw_report.tsv" ng-href="{{ rawReport }}">Download raw report</a>, <a class="download-link" download="summary_report.tsv" ng-href="{{ summaryReport }}">download summary report</a>, or use PlotCritic script <em>retrieval.py</em> to download scores with more options.</p>
+				<p>Results for project `{{project}}`. <a class="download-link" download="raw_report.tsv" ng-href="{{ rawReport }}">Download raw report</a>, <a class="download-link" download="summary_report.tsv" ng-href="{{ summaryReport }}">download summary report</a>, or review the PlotCritic script <em>retrieval.py</em> for more options.</p>
 				<table class="table table-bordered">
 					<tr>
 					<th ng-repeat="field in header track by $index">
