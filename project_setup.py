@@ -299,10 +299,11 @@ try:
         AutoVerifiedAttributes=[
             'email',
         ],
-        EmailVerificationMessage='You have been invited to join a PlotCritic project at ' +
-            config_data['AWSBucketURL'] + '. This email address ('+ args.email + \
-                    ') is your username. Enter the following ' +\
-                    'confirmation code to gain access and set your own password: {####}.',
+        EmailVerificationMessage='<p style="font-size:16px;">You have been invited to join the PlotCritic project <a href="' +
+        config_data['AWSBucketURL'] + '"><em>'+config_data['projectName']+'</em></a>.</p> <p style="font-size:14px;">'+
+            'Your username is the email address this is directed to.</p> '+
+            '<p>Be aware that if your email account redirects you may view the invite in another account.</p>'+
+            '<br><p style="font-size:16px;">Enter the following confirmation code to gain access and set your own password: <em>{####}</em>.</p>',
         EmailVerificationSubject="PlotCritic Invitation",
         AdminCreateUserConfig={'AllowAdminCreateUserOnly': False},
     )
