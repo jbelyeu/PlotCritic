@@ -76,8 +76,10 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window, 
 				authenticatedLogin(function(){
 					$scope.initialLogin = true;
 					$scope.changingPassword = true;
-					$cookies.put('pass',$scope.password);
-	        		$cookies.put('email',$scope.email);
+	        		var expiry = new Date();
+					expiry.setHours(expiry.getHours()+1)
+					$cookies.put('pass',$scope.password, {'expires': expiry});
+					$cookies.put('email',$scope.email, {'expires': expiry});
 					$scope.$apply();
 				});
 			}
@@ -99,8 +101,10 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window, 
 		else {
 			authenticatedLogin(function(){
 				$scope.authenticated = true;
-				$cookies.put('pass',$scope.password);
-        		$cookies.put('email',$scope.email);
+				var expiry = new Date();
+				expiry.setHours(expiry.getHours()+1)
+				$cookies.put('pass',$scope.password, {'expires': expiry});
+        		$cookies.put('email',$scope.email, {'expires': expiry});
 	        	$scope.$apply();
 			});
 		}
@@ -178,6 +182,9 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window, 
 						alert ("Password updated");
 						$scope.authenticated = true;
 						$scope.$apply();
+						var expiry = new Date();
+						expiry.setHours(expiry.getHours()+1)
+						$cookies.put('pass',$scope.password, {'expires': expiry});
 	        		}
 	        	});
 	        }
@@ -186,7 +193,13 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window, 
 		        $scope.password = $scope.newPassword1;
 				alert ("Password updated");
 				$scope.authenticated = true;
-				$scope.$apply();				    
+				$scope.$apply();
+				
+				var expiry = new Date();
+				expiry.setHours(expiry.getHours()+1)
+				var expiry = new Date();
+				expiry.setHours(expiry.getHours()+1)
+				$cookies.put('pass',$scope.password, {'expires': expiry});
 	        }
 	    });
 	};	
