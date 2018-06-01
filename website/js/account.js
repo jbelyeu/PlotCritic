@@ -4,10 +4,10 @@ if (window){
   Object.assign(env, window.__env);
 }
 
-var app = angular.module("svApp", []);
+var app = angular.module("svApp", ['ngCookies']);
 app.constant('__env', env);
 
-app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) {
+app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window, $cookies) {
 
 	$scope.email = '';
 	$scope.password = '';
@@ -76,6 +76,8 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 				authenticatedLogin(function(){
 					$scope.initialLogin = true;
 					$scope.changingPassword = true;
+					$cookies.put('pass',$scope.password);
+	        		$cookies.put('email',$scope.email);
 					$scope.$apply();
 				});
 			}
@@ -97,6 +99,8 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 		else {
 			authenticatedLogin(function(){
 				$scope.authenticated = true;
+				$cookies.put('pass',$scope.password);
+        		$cookies.put('email',$scope.email);
 	        	$scope.$apply();
 			});
 		}
@@ -188,7 +192,10 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	};	
 
 	$scope.reload = function () {
+		$cookies.remove('pass');
+		$cookies.remove('user');
 		$window.location.reload();
+
 	};
 
 	$scope.submit = function() {
@@ -196,4 +203,10 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 			init();
 		}
 	};
+
+	$scope.email = $cookies.get('email');
+	$scope.password = $cookies.get('pass');
+	if ($scope.email !== undefined && $scope.password !== undefined ) {
+		$scope.submit();
+	}
 });
