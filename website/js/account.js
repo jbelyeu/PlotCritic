@@ -15,7 +15,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	$scope.authenticated = false;
 	$scope.changingPassword = false;
 	$scope.deletingAccount = false;
-	$scope.newUserEmails = ['','',''];
+	$scope.newUserEmails = [''];
 	$scope.newUsers = [];
 	$scope.confirming = false;
 	AWSCognito.config.apiVersions = {
@@ -31,7 +31,57 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	var cognitoUser;
 	var defaultPassword = "Password1@";
 
+	var authenticatedLogin = function (callback) {
+		var authenticationData = {
+	        Username : $scope.email, 
+	        Password :  $scope.password
+	    };
+	    var userData = {
+		    Username : $scope.email,
+		    Pool : userPool
+		};
 
+	    var authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
+	    cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+		cognitoUser.authenticateUser(authenticationDetails, {
+	        onSuccess: function (result) {
+	        	authenticationResult = result;
+	        	callback();	        	
+	        }, 
+	        onFailure: function(err) {
+	        	console.log(err);
+	        	var element = angular.element( document.querySelector( '#failedAuth' ) );
+				element.removeClass('hidden');
+	        }
+    	});
+	};
+
+	var unauthenticatedLogin = function (userPool) {
+		var forceAliasCreation = true;
+    	userPool.client.makeUnauthenticatedRequest('confirmSignUp', {
+			ClientId: userPool.getClientId(),
+			ConfirmationCode: $scope.password,
+			Username: $scope.email,
+			ForceAliasCreation: forceAliasCreation,
+		}, 
+		err => {
+			if (err) {
+				console.log(err);
+	        	var element = angular.element( document.querySelector( '#failedAuth' ) );
+				element.removeClass('hidden');
+			}
+			else {
+				$scope.password = defaultPassword;
+				$scope.confirming = false;
+				authenticatedLogin(function(){
+					$scope.initialLogin = true;
+					$scope.changingPassword = true;
+					$scope.$apply();
+				});
+			}
+		});
+
+	};
 
 	var init = function() {
 		// Sign user in (depends on pool object) and store token
@@ -42,60 +92,15 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 		});
 
 		if ($scope.confirming) {
-	       	var forceAliasCreation = true;
-        	userPool.client.makeUnauthenticatedRequest('confirmSignUp', {
-				ClientId: userPool.getClientId(),
-				ConfirmationCode: $scope.password,
-				Username: $scope.email,
-				ForceAliasCreation: forceAliasCreation,
-			}, 
-			err => {
-				if (err) {
-					console.log(err);
-		        	var element = angular.element( document.querySelector( '#failedAuth' ) );
-					element.removeClass('hidden');
-				}
-				else {
-					alert("Account confirmed. Please begin by setting your password or you will lose access.");
-					$scope.password = defaultPassword;
-					$scope.confirming = false;
-					init();
-				}
+	       	unauthenticatedLogin(userPool);
+		}
+		else {
+			authenticatedLogin(function(){
+				$scope.authenticated = true;
+	        	$scope.$apply();
 			});
 		}
-		else {	
-				var authenticationData = {
-		        Username : $scope.email, 
-		        Password :  $scope.password
-		    };
-		    var userData = {
-			    Username : $scope.email,
-			    Pool : userPool
-			};
-
-		    var authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
-		    cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
-			cognitoUser.authenticateUser(authenticationDetails, {
-		        onSuccess: function (result) {
-		        	authenticationResult = result;
-		        	$scope.authenticated = true;
-		        	$scope.$apply();
-		        }, 
-		        onFailure: function(err) {
-		        	console.log(err);
-		        	var element = angular.element( document.querySelector( '#failedAuth' ) );
-					element.removeClass('hidden');
-		        }
-	    	});
-		}
 	};
-
-
-
-
-
-
-	 
 
 	$scope.addNewField = function () {
 		$scope.newUserEmails.push('');
@@ -127,7 +132,6 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 
 	$scope.deleteAccount = function () {
 		if ($scope.deleteAccountPassword === $scope.password) {
-			console.log($scope.deleteAccountPassword);
 			cognitoUser.deleteUser(function(err, result) {
 		        if (err) {
 		            console.log(err);
@@ -168,6 +172,8 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 				        $scope.changingPassword = false;
 				        $scope.password = $scope.newPassword1;
 						alert ("Password updated");
+						$scope.authenticated = true;
+						$scope.$apply();
 	        		}
 	        	});
 	        }
@@ -175,6 +181,8 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 		       	$scope.changingPassword = false;
 		        $scope.password = $scope.newPassword1;
 				alert ("Password updated");
+				$scope.authenticated = true;
+				$scope.$apply();				    
 	        }
 	    });
 	};	
@@ -188,5 +196,4 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 			init();
 		}
 	};
-
 });

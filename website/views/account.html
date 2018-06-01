@@ -22,8 +22,8 @@
 	</div>
 
 	<div ng-app="svApp" ng-controller="svCtrl">
-	 	<div class="centeredInput" ng-hide="authenticated">
-			<form ng-submit="submit()">
+	 	<div class="centeredInput" ng-hide="authenticated" >
+			<form ng-submit="submit()" ng-disabled="initialLogin">
 				<p class="infoTitle">Sign In: </p>
 				<label for="email" class="emailLabel">User email</label>
 			 	<input type="email" ng-model="email" name="email" required/>
@@ -40,7 +40,20 @@
 				<p>If you are logging in with a confirmation code instead of a password, make sure to check the "Confirming new account" button.</p>
 			</div>	
 		</div>
-		
+
+		<div class="initialLoginDiv" ng-show="initialLogin">
+			<form ng-submit=changePassword() ng-show=changingPassword>
+				<p class="infoTitle">Welcome to the project! Enter a password to maintain access</p>
+				<label for="newpass" class="newPasswordLabel1">Type new password:</label>
+			 	<input type="password" ng-model="newPassword1" name="newpass" required/>
+			 	<br>
+			 	<label for="newpassagain" class="newPasswordLabel2">Re-type new password:</label>
+			 	<input type="password" ng-model="newPassword2" name="newpassagain" required/>
+			 	<br>
+			 	<input type="submit" id="submit" class="changePasswordBtn" value="Submit changed password"/>			 	
+			</form>
+		</div>
+
 		<div class="userEmail" ng-show="authenticated">
 			<p>{{email}}</p>
 			<p>Project: {{project}}</p>
@@ -78,7 +91,7 @@
             				<label>New user email:</label>
             				<input type="email" ng-model="newUserEmails[$index]" class="addUserInput"/>          				
             			</div>
-						<input type="submit" id="submit" class="changePasswordBtn" value="Add these users">									
+						<input type="submit" id="submit" class="changePasswordBtn" value="Add user(s)">									
 					</form>
 					<button ng-click="addNewField()" class="addFieldBtn">+Add space</button>
         		</div>

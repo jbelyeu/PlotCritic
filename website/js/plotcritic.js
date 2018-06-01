@@ -39,6 +39,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	$scope.curationAnswers = [];
 	$scope.additionalCurationItems = __env.config.additionalCuration;
 	$scope.additionalCurationResponses = {};
+	var defaultPassword = "Password1@";
 
 	for (key in __env.config.curationQandA.answers) {
 		$scope.curationAnswers.push([key, __env.config.curationQandA.answers[key]]);
@@ -68,6 +69,134 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
         	}
         });
     })
+
+ 	var authenticatedLogin = function (callback){
+		var authenticationData = {
+	        Username : $scope.email, 
+	        Password :  $scope.password
+	    };
+	    var userData = {
+		    Username : $scope.email,
+		    Pool : userPool
+		};
+
+	    var authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
+	    var logins = {};
+	    cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+    	AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+		    IdentityPoolId: identityPoolId,
+		    Logins: logins
+		});	
+		cognitoUser.authenticateUser(authenticationDetails, {
+	        onSuccess: function (result) {
+	        	authenticationResult = result;
+	        	logins['cognito-idp.'+__env.config.region+'.amazonaws.com/'+userPoolId] = result.getIdToken().getJwtToken();
+				AWS.config.credentials.get(function(err){
+				    if (err) {
+				        alert(err);
+				    }
+				});
+	        	callback();
+	        }, 
+	        onFailure: function(err) {
+	        	console.log(err);
+	        	var element = angular.element( document.querySelector( '#failedAuth' ) );
+				element.removeClass('hidden');
+	        }
+    	});
+	};
+
+	var unauthenticatedLogin = function (userPool) {
+		var forceAliasCreation = true;
+    	userPool.client.makeUnauthenticatedRequest('confirmSignUp', {
+			ClientId: userPool.getClientId(),
+			ConfirmationCode: $scope.password,
+			Username: $scope.email,
+			ForceAliasCreation: forceAliasCreation,
+		}, 
+		err => {
+			if (err) {
+				console.log(err);
+	        	var element = angular.element( document.querySelector( '#failedAuth' ) );
+				element.removeClass('hidden');
+			}
+			else {
+				$scope.password = defaultPassword;
+				$scope.confirming = false;
+				authenticatedLogin(function(){
+					$scope.initialLogin = true;
+					$scope.changingPassword = true;
+					$scope.$apply();
+				});
+			}
+		});
+	};
+
+	var init = function() {
+		// Sign user in (depends on pool object) and store token
+		//***************************************************************************
+		userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool({
+		    UserPoolId : userPoolId,
+		    ClientId : clientID 
+		});
+
+		if ($scope.confirming) {
+	       	unauthenticatedLogin(userPool);
+		}
+		else {
+			authenticatedLogin(function () {
+				loadImages(false);
+	        	$scope.authenticated = true;
+	        	$scope.$apply();
+			});
+		}
+	};
+
+	$scope.changePassword = function () {
+		if ( !$scope.newPassword1 || !$scope.newPassword2) {
+			alert ("Please enter your new password twice to verify it");
+			return;
+		} 
+		if ($scope.newPassword1 !== $scope.newPassword2 ) {
+			alert ("Mismatched passwords");
+			return;
+		}
+		if ($scope.newPassword1 === defaultPassword) {
+			alert ("Invalid/insecure password");
+			return;
+		}
+		if ($scope.newPassword1.length < 6) {
+			alert("Invalid password. Passwords must be at least 6 characters long");
+			return;
+		}
+		cognitoUser.changePassword($scope.password, $scope.newPassword1, function(err, result) {
+	        if (err) {
+	        	cognitoUser.changePassword(defaultPassword, $scope.newPassword1, function(err, result) {
+	        		if (err) {
+	        			alert("Failed to update password. You may have exceeded your attempt limit for now.");
+		            	console.log(err);
+	        		}
+	        		else {
+				        $scope.changingPassword = false;
+				        $scope.password = $scope.newPassword1;
+						alert ("Password updated");
+						$scope.authenticated = true;
+						$scope.$apply();
+						loadReport();
+	        		}
+	        	});
+	        }
+	        else {
+		       	$scope.changingPassword = false;
+		        $scope.password = $scope.newPassword1;
+				alert ("Password updated");
+
+				loadImages(false);
+	        	$scope.authenticated = true;
+	        	$scope.$apply();
+	        }
+	    });
+	};
 
 	var filterImages = function(seeAgain) {
 		var scores = [];
@@ -171,52 +300,6 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 		};
 		batchScan(params);
 	}
-
-	var init = function () {
-		// Sign user in (depends on pool object) and store token
-		//***************************************************************************
-		userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool({
-		    UserPoolId : userPoolId,
-		    ClientId : clientID
-		});
-
-		var authenticationData = {
-	        Username : $scope.email, 
-	        Password :  $scope.password
-	    };
-	    var userData = {
-		    Username : $scope.email,
-		    Pool : userPool
-		};
-
-	    var authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
-	    var logins = {};
-	    cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
-    	AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-		    IdentityPoolId: identityPoolId,
-		    Logins: logins
-		});
-		cognitoUser.authenticateUser(authenticationDetails, {
-	        onSuccess: function (result) {
-	        	authenticationResult = result;
-	        	logins['cognito-idp.'+__env.config.region+'.amazonaws.com/'+userPoolId] = result.getIdToken().getJwtToken();			 
-				AWS.config.credentials.refresh(function(err){
-				    if (err) {
-				        alert(err);
-				        console.log(err);
-				    }
-				});
-	        	loadImages(false);
-	        	$scope.authenticated = true;
-	        	$scope.$apply();
-	        }, 
-	        onFailure: function(err) {
-	        	console.log(err);
-	        	var element = angular.element( document.querySelector( '#failedAuth' ) );
-				element.removeClass('hidden');
-	        }
-    	});
-	};
 
 	var shuffleArray = function (arr) {
 	    for (var i = arr.length - 1; i > 0; i--) {
@@ -326,8 +409,6 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window) 
 	};
 
 	$scope.submit = function() {
-		var element = angular.element( document.querySelector( '#failedAuth' ) );
-		element.addClass('hidden');
 		if ($scope.email != '' && $scope.password != '') {
 			init();
 		}
