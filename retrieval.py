@@ -100,7 +100,7 @@ else:
                     if type(entry[field]) == list:
                         fields_to_show.append(",".join(entry[field]))
                     else:
-                        fields_to_show.append(entry[field])
+                        fields_to_show.append(str(entry[field]))
                 print ("\t".join(fields_to_show))
             except Exception as e:
                 if args.verbose:

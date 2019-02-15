@@ -20,10 +20,6 @@ parser.add_argument("-c","--config",
     help="Config file to access AWS resources",
     required=True)
 
-parser.add_argument("--region",
-    help="AWS region",
-    default="us-east-1"
-)
 args = parser.parse_args()
 
 with open(args.config,'r') as config_file:
@@ -32,7 +28,7 @@ client = boto3.client('s3',
     aws_access_key_id=config_data['accessKey'], 
     aws_secret_access_key=config_data['secretAccessKey'],
     api_version='2006-03-01',
-    region_name=args.region
+    region_name=config_data['region']
 )
 transfer = S3Transfer(client)
 
@@ -76,7 +72,7 @@ dynamodb = boto3.resource('dynamodb',
     aws_access_key_id=config_data['accessKey'], 
     aws_secret_access_key=config_data['secretAccessKey'],
     api_version='2012-08-10',
-    region_name=args.region
+    region_name=config_data['region']
 )
 imgs_table = dynamodb.Table(config_data['dynamoImagesTable'])
 with imgs_table.batch_writer() as batch:

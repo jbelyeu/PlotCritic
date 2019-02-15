@@ -20,10 +20,6 @@ parser.add_argument('-f', "--full-delete",
     required=False,
     action='store_true'
 )
-parser.add_argument("--region",
-    help="AWS region",
-    default="us-east-1"
-)
 parser.add_argument('-c', "--config", help="configuration file from `setup.py`", required=True)
 args = parser.parse_args()
 with open(os.path.join(args.config), 'r') as config_file:
@@ -46,7 +42,7 @@ try:
             aws_access_key_id=config_data['accessKey'],
             aws_secret_access_key=config_data['secretAccessKey'],
             api_version='2006-03-01',
-            region_name=args.region
+            region_name=config_data['region']
         )
         bucket = s3_resource.Bucket(config_data['AWSBucketName'])
         bucket.objects.all().delete()
@@ -67,7 +63,7 @@ try:
             aws_access_key_id=config_data['accessKey'],
             aws_secret_access_key=config_data['secretAccessKey'],
             api_version='2012-08-10',
-            region_name=args.region
+            region_name=config_data['region']
         )
 
         delete_img_table_response = dynamodb_client.delete_table(
@@ -104,7 +100,7 @@ try:
             aws_access_key_id=config_data['accessKey'],
             aws_secret_access_key=config_data['secretAccessKey'],
             api_version='2016-04-18',
-            region_name=args.region
+            region_name=config_data['region']
         )
         delete_user_pool_response = cognito_identity_provider_client.delete_user_pool(
             UserPoolId=config_data['userPoolId']
@@ -125,7 +121,7 @@ try:
         cognito_identity_pool_client = boto3.client('cognito-identity',
             aws_access_key_id=config_data['accessKey'],
             aws_secret_access_key=config_data['secretAccessKey'],
-            region_name=args.region,
+            region_name=config_data['region'],
             api_version='2014-06-30'
         )
         delete_identity_pool_response = cognito_identity_pool_client.delete_identity_pool(
@@ -150,7 +146,7 @@ try:
             aws_access_key_id=config_data['accessKey'],
             aws_secret_access_key=config_data['secretAccessKey'],
             api_version="2010-05-08",
-            region_name=args.region
+            region_name=config_data['region']
         )
 
         list_attached_policies_response = iam_client.list_attached_role_policies(

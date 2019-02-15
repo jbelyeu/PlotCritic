@@ -167,10 +167,21 @@ try:
         api_version='2006-03-01',
         region_name=config_data['region']
     )
-    s3_create_bucket_response = s3_client.create_bucket(
-        ACL='public-read',
-        Bucket=config_data['AWSBucketName']
-    )
+    url = ''
+    if config_data['region'] == "us-east-1":
+        s3_create_bucket_response = s3_client.create_bucket(
+            ACL='public-read',
+            Bucket=config_data['AWSBucketName']
+        )
+        config_data['AWSBucketURL'] = "http://"+ config_data['AWSBucketName'] + ".s3-website-"+config_data['region']+".amazonaws.com"
+    else:
+        s3_create_bucket_response = s3_client.create_bucket(
+            ACL='public-read',
+            CreateBucketConfiguration={'LocationConstraint':config_data['region']},
+            Bucket=config_data['AWSBucketName']
+        )
+        config_data['AWSBucketURL'] = "http://"+ config_data['AWSBucketName'] + ".s3-website."+config_data['region']+".amazonaws.com"
+
     s3_configure_bucket_website_response = s3_client.put_bucket_website(
         Bucket=config_data['AWSBucketName'],
         WebsiteConfiguration={
@@ -182,11 +193,11 @@ try:
             }
         }
     )
-    config_data['AWSBucketURL'] = "http://"+ config_data['AWSBucketName'] + ".s3-website-us-east-1.amazonaws.com"
 except Exception as e:
     print ("Error: Failed to create S3 bucket. Writing out config and exiting setup")
     print_config(True)
     print (type(e))
+    print (e)
     sys.exit(1)
 
 #create dynamoDB img table (named {project}_img_metadata)
@@ -300,7 +311,7 @@ try:
             'email',
         ],
         EmailVerificationMessage='<p style="font-size:16px;">You have been invited to join the PlotCritic project <a href="' +
-        config_data['AWSBucketURL'] + '"><em>'+config_data['projectName']+'</em></a>.</p> <p style="font-size:14px;">'+
+        config_data['AWSBucketURL'] + "/views/account.html" + '"><em>'+config_data['projectName']+'</em></a>.</p> <p style="font-size:14px;">'+
             'Your username is the email address this is directed to.</p> '+
             '<p>Be aware that if your email account redirects you may view the invite in another account.</p>'+
             '<br><p style="font-size:16px;">Enter the following confirmation code to gain access and set your own password: <em>{####}</em>.</p>',
