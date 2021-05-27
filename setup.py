@@ -31,7 +31,7 @@ setup(
     author_email="jrbelyeu@gmail.com",
     url="https://github.com/jbelyeu/PlotCritic.git",
     packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
-    package_data={"plotcritic": ["LICENSE", "README.md"]},
+    package_data={"plotcritic": ["LICENSE", "README.md", "plotcritic/templates/"]},
     data_files=[("plotcritic", data_files)],
     install_requires=requires,
     license="MIT",
