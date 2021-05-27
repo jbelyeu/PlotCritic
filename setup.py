@@ -15,11 +15,11 @@ with open("plotcritic/__init__.py", "r") as fd:
 with open("requirements.txt", "r") as f:
     requires = f.read().splitlines()
 
-start_point = os.path.join("plotcritic", 'templates')
-data_files = []
-for root, dirs, files in os.walk(start_point):
-    root_files = [os.path.join(root, i) for i in files]
-    data_files += root_files
+#start_point = os.path.join("plotcritic", 'templates')
+#data_files = []
+#for root, dirs, files in os.walk(start_point):
+#    root_files = [os.path.join(root, i) for i in files]
+#    data_files += root_files
 
 setup(
     name="plotcritic",
@@ -31,8 +31,8 @@ setup(
     author_email="jrbelyeu@gmail.com",
     url="https://github.com/jbelyeu/PlotCritic.git",
     packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
-    package_data={"plotcritic": ["LICENSE", "README.md", "plotcritic/templates/"]},
-    data_files=[("plotcritic", data_files)],
+    package_data={"plotcritic": ["LICENSE", "README.md", "templates/*"]},
+ #   data_files=[("plotcritic", data_files)],
     install_requires=requires,
     license="MIT",
     zip_safe=False,
