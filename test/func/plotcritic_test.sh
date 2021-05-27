@@ -10,7 +10,7 @@ func_path="test/func/"
 imgs_without_json=$data_path"without_json"
 imgs_with_json=$data_path"with_json"
 
-printf "\n\nPlotCritic tests"
+printf "\n\nPlotCritic tests\n"
 echo "##########################################################################"
 
 project="basic_test"
@@ -43,6 +43,7 @@ if [ $create_site_basic ]; then
     assert_equal "$project/views/report.html" $( ls "$project/views/report.html" )
 fi
 ls  $project/*
+echo "##########################################################################"
 rm -r $project
 
 project="basic_with_json_test"
