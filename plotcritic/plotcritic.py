@@ -155,6 +155,10 @@ def plotcritic(parser):
 
     #copy the templates for the web site
     shutil.copytree(get_templates(), args.project)
+    import glob
+    print(glob.glob(args.project + "/**/*"))
+
+
 
     #add the images to the website
     config_data["image_data"] = []
