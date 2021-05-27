@@ -4,3 +4,4 @@ build/
 dist/
 plotcritic.egg-info/
 plotcritic/templates/.DS_Store
+plotcritic/__pycache__/
