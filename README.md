@@ -4,6 +4,7 @@
 
 # PlotCritic
 PlotCritic is a user-friendly and easily deployed tool for image scoring based on user-defined questions and answers.
+If you use PlotCritic, please cite https://academic.oup.com/gigascience/article/7/7/giy064/5026174
 
 ## Installation
 PlotCritic is available from Conda:
