@@ -142,12 +142,6 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window, 
 			}
 	};
 
-	// $scope.reload = function () {
-	// 	$cookies.remove('user');
-	// 	$window.location.reload();
-	//
-	// };
-
 	$scope.submit = function() {
 		if ($scope.user != '') {
 			init();

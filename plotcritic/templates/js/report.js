@@ -59,12 +59,12 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window, 
 				if (!(user in scoreTracker)) {
 					scoreTracker[user] = {};
 				}
-				if (! (scoreItem['img_name'] in scoreTracker[user])) {
-					scoreTracker[user][scoreItem['img_name']] = scoreItem;
+				if (! (scoreItem['Image'] in scoreTracker[user])) {
+					scoreTracker[user][scoreItem['Image']] = scoreItem;
 				}
 				else {
-					if (scoreTracker[user][scoreItem['img_name']]['response_time'] < scoreItem['response_time']) {
-						scoreTracker[user][scoreItem['img_name']] = scoreItem;
+					if (scoreTracker[user][scoreItem['Image']]['response_time'] < scoreItem['response_time']) {
+						scoreTracker[user][scoreItem['Image']] = scoreItem;
 					}
 				}
 			}
@@ -112,7 +112,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window, 
 			for (var user in $scope.rawData) {
 				$scope.rawData[user].forEach(function (score_item) {
 
-					var img_name = score_item['img_name'];
+					var img_name = score_item['Image'];
 					if (! (img_name in summaryData)) {
 	    			summaryData[img_name] = [];
 		    		for (var i = 0; i < summaryFields.length; ++i ) {
@@ -138,7 +138,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window, 
 					//store scores for downloadable report
 					if (("score" in score_item)) {
 		    		fields_to_show = [score_item['user'],
-		    							score_item['img_name'],
+		    							score_item['Image'],
 		    							score_item['score'].toString(),
 		    							score_item['load_time'].toString(),
 		    							score_item['response_time'].toString(),
