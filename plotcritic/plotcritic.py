@@ -156,7 +156,9 @@ def plotcritic(parser):
     #copy the templates for the web site
     shutil.copytree(get_templates(), args.project)
     import glob
+    print("\n\n\n\n")
     print(glob.glob(args.project + "/**/*"))
+    print("\n\n\n\n")
 
 
 
