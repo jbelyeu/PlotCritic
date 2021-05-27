@@ -7,9 +7,6 @@ import json
 import shutil
 
 
-def key_val(arg):
-    return [str(x) for x in arg.split(':')]
-
 default_question = "Does the top sample support the variant type shown? " +\
     "If so, does it appear to be a de novo mutation? Choose one answer " + \
     "from below or type the corresponding letter key."
@@ -33,46 +30,7 @@ default_report_fields = [
     'max_depth'
 ]
 
-def add_create(p):
-    parser = p.add_parser(
-        "create",
-        help="creates a website for image curation",
-        description="given a set of images and metadata files, creates a local website for"
-        " curating images based on a given question and answer set"
-    )
-    parser.add_argument('-p', "--project", 
-        help="Unique name for the project",
-        required=True
-    )
-    parser.add_argument('-q', "--curation_question", 
-        help="The curation question to show in the PlotCritic website. Default: " + default_question
-    )
-    parser.add_argument('-A', "--curation_answers", 
-        help="colon-separated key,values pairs of 1-letter codes and associated " + 
-        "curation answers for the curation question (i.e: 'key1','value1' 'key2','value2'). " +
-        'Default (based on default question): "s":"Supports" "n":"Does not support" "d":"De novo"',
-        type=key_val, 
-        nargs="+"
-    )
-    parser.add_argument('-R', "--report_fields",
-        help="space-separated list of fields about the image, for sample identification and additional information. " + 
-        "Default values (based on the genomic structural variant scoring) are: " + ", ".join(default_report_fields),
-        nargs="+",
-        default=default_report_fields
-    )
-    parser.add_argument('-S', "--summary_fields",
-        help="subset of the report fields that will be shown in the web report after scoring. Space-separated. ",
-        nargs="+",
-        required=True
-    )
-    parser.add_argument('-i', "--images_dir",
-        help="directory of images and metadata files for curation",
-        required=True
-    )
-    parser.set_defaults(func=create)
-
-
-def create(parser, args):
+def plotcritic(parser, args):
     config_data = {}
     curation_question = ''
     curation_answers = {}
