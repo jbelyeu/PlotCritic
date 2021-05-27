@@ -154,6 +154,11 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window, 
 		}
 	};
 
+	$scope.signOut = function() {
+			$cookies.remove('user');
+			$window.location.reload();
+	};
+
 	$scope.user = $cookies.get('user');
 	if ($scope.user !== undefined) {
 		$scope.submit();

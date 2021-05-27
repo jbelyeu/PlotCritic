@@ -30,6 +30,9 @@
 
 
 		<div class="user" ng-show="signedIn">
+			<form ng-submit="signOut()" >
+				<input type="submit" class="submit" value="Sign out"/>
+			</form>
 			<p>User: {{user}}</p>
 			<p>Project: {{project}}</p>
 		</div>

@@ -36,7 +36,6 @@ def plotcritic(parser):
     curation_question = ''
     curation_answers = {}
 
-
     #check the curation question and answers for validity
     if args.curation_answers and args.curation_question:
         ## check answer codes
