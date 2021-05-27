@@ -156,7 +156,6 @@ def plotcritic(parser):
     #copy the templates for the web site
     shutil.copytree(get_templates(), args.project)
 
-
     #add the images to the website
     config_data["image_data"] = []
     os.makedirs(os.path.join(args.project,"imgs/"))
@@ -164,17 +163,10 @@ def plotcritic(parser):
 
         
     #create environment JS file
-    try:
-        with open(os.path.join(args.project,"js","env.js"), 'w') as env_file:
-            print('(function (window) {window.__env = window.__env || {};window.__env.config = '
-                + json.dumps(config_data)
-                + '}(this));', file=env_file)
-    except:
-        print(os.listdir(args.project))
-        with open(args.project + "/index.html", 'r') as fh:
-            for line in fh:
-                print(line)
-
+    with open(os.path.join(args.project,"js","env.js"), 'w') as env_file:
+        print('(function (window) {window.__env = window.__env || {};window.__env.config = '
+            + json.dumps(config_data)
+            + '}(this));', file=env_file)
 
 if __name__ == "__main__":
     sys.exit("Import this as a module")
