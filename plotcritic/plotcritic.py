@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 from __future__ import print_function
 # Python 2/3 compatibility
+from .__init__ import get_templates
 import sys
 import os
 import json
@@ -153,7 +154,7 @@ def plotcritic(parser):
                 + " Remove it or change project name before continuing.")
 
     #copy the templates for the web site
-    shutil.copytree(os.path.join(os.path.dirname(__file__), "templates"), args.project)
+    shutil.copytree(get_templates(), args.project)
 
     #add the images to the website
     config_data["image_data"] = []
