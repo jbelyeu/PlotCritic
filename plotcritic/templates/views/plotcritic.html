@@ -45,7 +45,7 @@
 
 				<p>{{currentImageIdx+1}}/{{image_data.length}} ({{(((currentImageIdx+1)/image_data.length)*100).toFixed(1)}}%)</p>
 				<div class="variantImgBox">
-					<img ng-src="{{image_data[currentImageIdx]['img_location']}}" class="variantImg">
+					<embed ng-src="{{image_data[currentImageIdx]['img_location']}}" class="variantImg">
 
 						<form class="additionalCurationForm">
 							<div ng-repeat="item in additionalCurationItems">
