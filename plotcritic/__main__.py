@@ -53,9 +53,7 @@ def main():
     print("\nPLOTCRITIC v{}".format(__version__), file=sys.stderr)
 
     parser = setup_args()
-    args = parser.parse_args()
-    args.func(parser, args)
-    plotcritic(args)
+    plotcritic(parser)
 
 
 if __name__ == "__main__":

@@ -30,7 +30,8 @@ default_report_fields = [
     'max_depth'
 ]
 
-def plotcritic(parser, args):
+def plotcritic(parser):
+    args = parser.parse_args()
     config_data = {}
     curation_question = ''
     curation_answers = {}
