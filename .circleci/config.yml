@@ -32,13 +32,13 @@ jobs:
       - *setup_p3
       - *install_plotcritic
       - *run_func_tests
-  test-macos-python3:
-    <<: *macos
-    steps:
-      - checkout
-      - *setup_p3
-      - *install_plotcritic
-      - *run_func_tests
+  #test-macos-python3:
+  #  <<: *macos
+  #  steps:
+  #    - checkout
+  #    - *setup_p3
+  #    - *install_plotcritic
+  #    - *run_func_tests
 
 workflows:
   version: 2
