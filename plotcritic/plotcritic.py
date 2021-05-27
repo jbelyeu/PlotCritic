@@ -171,6 +171,9 @@ def plotcritic(parser):
                 + '}(this));', file=env_file)
     except:
         print(os.listdir(args.project))
+        with open(args.project "/index.html", 'r') as fh:
+            for line in fh:
+                print(line)
 
 
 if __name__ == "__main__":
