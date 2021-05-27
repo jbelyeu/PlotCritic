@@ -1,4 +1,4 @@
-.userEmail {
+.user {
     position: absolute;
     right: 2%;
     top: 0%;
@@ -6,7 +6,7 @@
     font-size: 1.1em;
 }
 
-.emailLabel {
+.userLabel {
     padding-right: 104px;
     padding-bottom: 8px;
 }
@@ -143,7 +143,7 @@
 
 .button_box {
     width: 50%;
-    padding: 10px;
+    /* padding: 10px; */
     margin: auto;
 }
 
@@ -190,4 +190,14 @@ a {
     font-size: 22px;
     margin: 5px 15px 5px 15px;
     color: black;
+}
+.download-link {
+  font-size: 1em;
+  text-align: center;
+  color: #2196F3;
+}
+.download_report_button {
+  margin-left:45%;
+  margin-top:1%;
+  font-size:1.2em;
 }

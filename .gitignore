@@ -1,0 +1,6 @@
+plotcritic/templates/imgs/
+*/.DS_Store
+build/
+dist/
+plotcritic.egg-info/
+plotcritic/templates/.DS_Store

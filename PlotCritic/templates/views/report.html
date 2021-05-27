@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>PlotCritic Web Report</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-cookies.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<link rel="stylesheet" href="../style/report.css">
+	<script src="../js/env.js"></script>
+  </head>
+
+<body>
+	<div class="wrapper">
+		<div class="links">
+			<a href="plotcritic.html">Score Images</a>
+			<a href="report.html">View Report</a>
+		</div>
+	</div>
+
+	<div ng-app="svApp" ng-controller="svCtrl">
+		<div class=main_frame>
+			<div class="user">
+				<p>Project: {{ project }}</p>
+			</div>
+
+			<div class="centeredInput">
+        <!-- <p><b>Upload curation results files from scoring (.json)</b></p> -->
+				<h4>Upload curation results files from scoring</h4>
+				<p>All results file must be uploaded together</p>
+
+				<label class="custom-file-input" for="Upload" >
+				</label>
+
+				<input id="Upload" type="file" multiple="multiple" name="reportsJson" accept="application/json" ng-model-instant onchange="angular.element(this).scope().storeContent(event)" style="visibility: hidden">
+
+
+			</div>
+
+			<div class="viewer" ng-hide="noReports">
+				<h3>Results for project `{{project}}`</h3>
+				<a class="download-link" download="{{project}}_complete_report.tsv" ng-href="{{ rawReport }}">Download complete report</a>
+				<br>
+				<a class="download-link" download="{{project}}_summary_report.tsv" ng-href="{{ summaryReport }}">Download summary report</a>
+
+
+				<table class="table table-bordered">
+					<tr>
+					<th ng-repeat="field in header track by $index">
+			        	<a href="#" ng-click="reorder($index)">{{ field }} </a>
+			        </th>
+					</tr>
+					<tr ng-repeat="record in records">
+						<td ng-repeat="item in record track by $index"> {{item}}</td>
+				  </tr>
+				</table>
+
+			</div>
+		</div>
+	</div>
+	<script src="../js/report.js"></script>
+</body>
+</html

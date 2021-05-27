@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head >
+    <meta charset="utf-8">
+    <title >PlotCritic</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-cookies.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<link rel="stylesheet" href="../style/plotcritic.css">
+	<script src="../js/env.js"></script>
+  </head>
+
+<body>
+	<div class="wrapper">
+		<div class="links">
+			<a href="plotcritic.html">Score Images</a>
+			<a href="report.html">View Report</a>
+		</div>
+	</div>
+
+  <div ng-app="svApp" ng-controller="svCtrl">
+		<div class="centeredInput" ng-hide="signedIn" >
+			<form ng-submit="submit()" >
+				<p class="infoTitle">Sign In: </p>
+				<label for="user" class="userLabel">User</label>
+			 	<input type="user" ng-model="user" name="user" required/>
+			 	<input type="submit" class="submit" value="Submit"/>
+			</form>
+		</div>
+
+
+		<div class="user" ng-show="signedIn">
+			<p>User: {{user}}</p>
+			<p>Project: {{project}}</p>
+		</div>
+
+		<div ng-show="signedIn" class=main_frame>
+      <div keydown-events ></div>
+
+			<div class="viewer" >
+				<div class="instructions"><p class="curationQuestion">{{curationQuestion}}</p></div>
+
+				<p>{{currentImageIdx+1}}/{{image_data.length}} ({{(((currentImageIdx+1)/image_data.length)*100).toFixed(1)}}%)</p>
+				<div class="variantImgBox">
+					<img ng-src="{{image_data[currentImageIdx]['img_location']}}" class="variantImg">
+
+						<form class="additionalCurationForm">
+							<div ng-repeat="item in additionalCurationItems">
+								<input type="checkbox" value="{{item}}" ng-model="additionalCurationResponses[item]"> {{item}}<br>
+							</div>
+						</form>
+
+				</div>
+			    <div class="button_box" ng-class="currentImage">
+            <button type="button" class="score_button" ng-repeat="answer in curationAnswers" ng-click=saveScore(answer[0])>{{answer[1]}} ({{answer[0]}})</button>
+				</div>
+			</div>
+
+		    <div class="endMsg" ng-show="reachedEnd"><p>You have reached the end of the available variants</p>
+		    </div>
+		    <div class="endMsg" ng-show="reachedStart"><p>You are at the beginning of the available variants</p>
+		    </div>
+		    <div class="button_box nav_box">
+			    <div class="left_button_box">
+			    	<button class="nav_button" ng-click=beginning()>&laquo; Start</button>
+				    <button class="start nav_button" ng-click=previous()>&#8249; Previous</button>
+				  </div>
+
+			    <div class="right_button_box">
+					  <button class="next nav_button" ng-click=next()>Next &#8250;</button>
+					  <button class="end nav_button" ng-click=ending()>End &raquo;</button>
+				  </div>
+			  </div>
+        <div class="download_report_button">
+          <a class="download-link" download="{{user}}_{{project}}_report.json" ng-href="{{ rawReport }}">Download report</a>
+        </div>
+		</div>
+	</div>
+	<script src="../js/plotcritic.js"></script>
+</body>
+</html
