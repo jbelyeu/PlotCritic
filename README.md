@@ -1,3 +1,7 @@
+[![CircleCI](https://circleci.com/gh/jbelyeu/PlotCritic/tree/master.svg?style=svg)](https://circleci.com/gh/jbelyeu/PlotCritic/tree/master)
+[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/PlotCritic/README.html)
+
+
 # PlotCritic
 PlotCritic is a user-friendly and easily deployed tool for image scoring based on user-defined questions and answers.
 
