@@ -1,5 +1,6 @@
 plotcritic/templates/imgs/
 */.DS_Store
+.DS_Store
 build/
 dist/
 plotcritic.egg-info/
