@@ -42,6 +42,7 @@ if [ $create_site_basic ]; then
     assert_equal "$project/views/plotcritic.html" $( ls "$project/views/plotcritic.html" )
     assert_equal "$project/views/report.html" $( ls "$project/views/report.html" )
 fi
+ls  $project/*
 rm -r $project
 
 project="basic_with_json_test"
