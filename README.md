@@ -16,7 +16,7 @@ plotcritic \
   -p tmp \
   -i imgs/ \
   -q "What is love?" \
-  -A "b":"Baby don't hurt me" "n":"No more" \
+  -A "b":"Baby don't hurt me" "d":"Don't hurt me" "n":"No more" \
 ```
 
 The arguments used above are:
