@@ -42,7 +42,7 @@ if [ $create_site_basic ]; then
     assert_equal "$project/views/plotcritic.html" $( ls "$project/views/plotcritic.html" )
     assert_equal "$project/views/report.html" $( ls "$project/views/report.html" )
 fi
-#rm -r $project
+rm -r $project
 
 project="basic_with_json_test"
 run create_site_basic \
@@ -73,6 +73,6 @@ if [ $create_site_basic ]; then
     assert_equal "$project/views/plotcritic.html" $( ls "$project/views/plotcritic.html" )
     assert_equal "$project/views/report.html" $( ls "$project/views/report.html" )
 fi
-#rm -r $project
+rm -r $project
 
 
