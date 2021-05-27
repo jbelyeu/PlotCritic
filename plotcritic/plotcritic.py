@@ -98,6 +98,18 @@ def valid_curation(curation_answers, curation_question, parser):
 def copy_images(images_dir, config_data, parser):
     for img_file in os.listdir(images_dir):
         img_name,img_ext = os.path.splitext(img_file)
+        allowed_filetypes = [
+            ".jpg",
+            ".jpeg",
+            ".pdf",
+            ".svg",
+            ".png",
+            ".json",
+        ]
+
+        if img_ext.lower() not in allowed_filetypes:
+            sys.exit("Image {} is not an accepted format ({})".format(img_file, ", ".join(allowed_filetypes)))
+
         metadata_filename = os.path.join(images_dir, img_name + ".json")
         metadata = {}
         
