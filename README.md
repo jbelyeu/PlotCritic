@@ -1,5 +1,5 @@
 [![CircleCI](https://circleci.com/gh/jbelyeu/PlotCritic/tree/master.svg?style=svg)](https://circleci.com/gh/jbelyeu/PlotCritic/tree/master)
-[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/PlotCritic/README.html)
+[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/plotcritic/README.html)
 
 
 # PlotCritic
@@ -29,9 +29,9 @@ The arguments used above are:
 
 `-i` A directory of images (may also contain .json metadata files). Required.
 
-`-q` A curation question to display in the website for scoring images. A default option exists, but it is expected that you will set this option for most projects.
+`-q` A curation question to display in the website for scoring images.
 
-`-A` The curation answers to display in the website for scoring images (must follow the example above, with a one-letter code and an answer for each entry, separated with commas and separated from other entries with spaces). Again, a default exists but likely will not perfectly fit your needs.
+`-A` The curation answers to display in the website for scoring images (must follow the example above, with a one-letter code and an answer for each entry, separated with commas and separated from other entries with spaces).
 
 ### Other arguments
 
@@ -74,16 +74,12 @@ optional arguments:
                         sv_type (default: False)
   -q CURATION_QUESTION, --curation_question CURATION_QUESTION
                         The curation question to show in the PlotCritic
-                        website. Samplot-oriented default. (default: Does the
-                        top sample support the variant type shown? If so, does
-                        it appear to be a de novo mutation? Choose one answer
-                        from below or type the corresponding letter key.)
+                        website. (default: None)
   -A CURATION_ANSWERS [CURATION_ANSWERS ...], --curation_answers CURATION_ANSWERS [CURATION_ANSWERS ...]
                         colon-separated key,values pairs of 1-letter codes and
                         associated curation answers for the curation question
-                        (i.e: 'key1','value1' 'key2','value2'). Default (based
-                        on default question): "s":"Supports" "n":"Does not
-                        support" "d":"De novo" (default: None)
+                        (i.e: 'key1','value1' 'key2','value2'). (default:
+                        None)
   -R REPORT_FIELDS [REPORT_FIELDS ...], --report_fields REPORT_FIELDS [REPORT_FIELDS ...]
                         space-separated list of info fields about the image.
                         If omitted, only the image name will be included in
