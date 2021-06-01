@@ -63,7 +63,7 @@ def get_json(metadata_filename, report_fields, parser):
             if key not in metadata and key != "Image":
                 parser.print_help()
                 sys.exit(
-                    "\nReport field `{}` is not present in metadata json file `{}`".format(
+                    "\nReport field [{}] is not present in metadata json file [{}]".format(
                         key, metadata_filename
                     )
                 )
