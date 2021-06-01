@@ -3,7 +3,7 @@ import argparse
 import sys
 
 from .__init__ import __version__
-from .plotcritic import plotcritic, samplot_question, samplot_report_fields, samplot_summary_fields
+from .plotcritic import plotcritic, samplot_report_fields, samplot_summary_fields
 
 
 def key_val(arg):
@@ -31,16 +31,15 @@ def setup_args():
         action="store_true",
     )
     parser.add_argument('-q', "--curation_question", 
-        help="The curation question to show in the PlotCritic website." 
-            + " Samplot-oriented default.",
-        default=samplot_question,
+        help="The curation question to show in the PlotCritic website.",
+        required=True,
     )
     parser.add_argument('-A', "--curation_answers", 
         help="colon-separated key,values pairs of 1-letter codes and associated " + 
-        "curation answers for the curation question (i.e: 'key1','value1' 'key2','value2'). " +
-        'Default (based on default question): "s":"Supports" "n":"Does not support" "d":"De novo"',
+        "curation answers for the curation question (i.e: 'key1','value1' 'key2','value2').",
         type=key_val, 
         nargs="+",
+        required=True,
     )
     parser.add_argument('-R', "--report_fields",
         help="space-separated list of info fields about the image. "

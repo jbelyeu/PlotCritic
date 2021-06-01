@@ -8,15 +8,6 @@ import json
 import shutil
 
 
-samplot_question = "Does the top sample support the variant type shown? " +\
-    "If so, does it appear to be a de novo mutation? Choose one answer " + \
-    "from below or type the corresponding letter key."
-
-samplot_answers = {
-    "s" : "Supports",
-    "n" : "Does not support",
-    "d" : "De novo",
-}
 samplot_report_fields = [
     "Image",
     "chrom", 
@@ -56,43 +47,44 @@ def valid_data_fields(report_fields, summary_fields):
                 sys.exit("all summary_fields must also be included in report_fields")
     return report_fields,summary_fields
 
-def validate_json_fields(metadata, report_fields, parser):
+def get_json(metadata_filename, report_fields, parser):
     """
     All user-defined report fields must be included in the metadata.
     Summary fields also must be included in metadata, but this is 
     handled by validate_summary_fields()
     """
-    for key in report_fields:
-        if key not in metadata and key != "Image":
-            parser.print_help()
-            sys.exit("all report_fields must also be included in a metadata .json object matched to each image")
+    metadata = {}
+    if (os.path.exists(metadata_filename) and os.path.isfile(metadata_filename)):
+        with open(metadata_filename, 'r') as meta_handle :
+            metadata = json.load(meta_handle)
+        for key in report_fields:
+            if key not in metadata and key != "Image":
+                parser.print_help()
+                sys.exit("\nReport field `{}` is not present in metadata json file `{}`"
+                        .format(key,metadata_filename))
+    elif report_fields != ["Image"]: #only Image is always included
+        parser.print_help()
+        sys.exit("\nAll report_fields must also be included in a metadata .json object matched to each image by name")
+    return metadata
+
 
 def valid_curation(curation_answers, curation_question, parser):
     answer_dict = {}
     #check the curation question and answers for validity
-    if curation_answers and curation_question:
-        ## check answer codes
-        try:
-            for k,val in curation_answers:
-                if len(k) != 1:
-                    print ("\nError: curation answers must have a 1-letter code\n")
-                    parser.print_help()
-                    sys.exit(1)
-                else:
-                    answer_dict[k] = val
-        except Exception as e:
-            print (e)
-            parser.print_help()
-            sys.exit("Invalid curation answer format")
-        return curation_question,answer_dict
-    elif curation_answers or curation_question:
-        print ("\nError: if curation question or curation answer "
-                + "arguments are set, both must be\n")
+    ## check answer codes
+    try:
+        for k,val in curation_answers:
+            if len(k) != 1:
+                print ("\nError: curation answers must have a 1-letter code\n")
+                parser.print_help()
+                sys.exit(1)
+            else:
+                answer_dict[k] = val
+    except Exception as e:
+        print (e)
         parser.print_help()
-        sys.exit(1)
-    else:
-        #they set neither, so set to the samplot defaults
-        return samplot_question,samplot_answers
+        sys.exit("Invalid curation answer format")
+    return curation_question,answer_dict
 
 
 def copy_images(images_dir, config_data, parser):
@@ -111,22 +103,13 @@ def copy_images(images_dir, config_data, parser):
             sys.exit("Image {} is not an accepted format ({})".format(img_file, ", ".join(allowed_filetypes)))
 
         metadata_filename = os.path.join(images_dir, img_name + ".json")
-        metadata = {}
-        
-        #if this isn't a metadata file but one exists for it, open that metadata and read it
+       
+        # skip json files for solo processing
         if ".json" == img_ext:
             continue #skip the json files
 
-        if (not (".json" == img_ext) 
-                and os.path.exists(metadata_filename) 
-                and os.path.isfile(metadata_filename)):
-            with open(metadata_filename, 'r') as meta_handle :
-                metadata = json.load(meta_handle)
-                validate_json_fields(
-                        metadata, 
-                        config_data['reportFields'],
-                        parser
-                )
+        #if this isn't a metadata file but one exists for it, open that metadata and read it
+        metadata = get_json(metadata_filename, config_data['reportFields'],parser)
         metadata["Image"] = img_name
         metadata["img_location"] = os.path.join("../imgs", img_file)
         config_data['image_data'].append(metadata)
