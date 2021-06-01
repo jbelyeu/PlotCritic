@@ -63,6 +63,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window, 
 
     //shuffle images and display first one
     $scope.image_data = shuffleArray($scope.image_data);
+		$scope.currentImageIdx = 0;
     $scope.currentImage = $scope.image_data[$scope.currentImageIdx]["img_location"];
     $scope.load_time = Date.now();
 	};
