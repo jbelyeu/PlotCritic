@@ -167,7 +167,7 @@ run create_site_custom_reporting_incorrect_json \
         -A "b":"Baby don't hurt me" "n":"No more"
 if [ $create_site_custom_reporting_incorrect_json ]; then
     assert_exit_code 1
-    assert_in_stderr "Report field [field1] is not present in metadata json file [test/data/with_json/test3.json]"
+    assert_in_stderr "Report field [field1] is not present in metadata json file"
 fi
 rm -r $project
 
