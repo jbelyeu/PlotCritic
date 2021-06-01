@@ -1,5 +1,5 @@
 [![CircleCI](https://circleci.com/gh/jbelyeu/PlotCritic/tree/master.svg?style=svg)](https://circleci.com/gh/jbelyeu/PlotCritic/tree/master)
-[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/PlotCritic/README.html)
+[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/plotcritic/README.html)
 
 
 # PlotCritic
