@@ -151,8 +151,6 @@
     border: 2px solid black;
     max-width: 100%;
     max-height: 75vh;
-		min-width: 50%;
-		min-height: 50%;
     height: auto;
 }
 .variantImgBox {
@@ -195,6 +193,11 @@ a {
 }
 .download-link {
   font-size: 1em;
+  text-align: center;
+  color: #2196F3;
+}
+.download-link-finished {
+  font-size: 1.2em;
   text-align: center;
   color: #2196F3;
 }

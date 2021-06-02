@@ -44,6 +44,8 @@
 				<div class="instructions"><p class="curationQuestion">{{curationQuestion}}</p></div>
 
 				<p>{{currentImageIdx+1}}/{{image_data.length}} ({{(((currentImageIdx+1)/image_data.length)*100).toFixed(1)}}%)</p>
+				<a class="download-link-finished" ng-show="reachedEnd" download="{{user}}_{{project}}_report.json" ng-href="{{ rawReport }}">Download report</a>
+
 				<div class="variantImgBox">
 					<embed ng-src="{{image_data[currentImageIdx]['img_location']}}" class="variantImg">
 
@@ -75,7 +77,7 @@
 				  </div>
 			  </div>
         <div class="download_report_button">
-          <a class="download-link" download="{{user}}_{{project}}_report.json" ng-href="{{ rawReport }}">Download report</a>
+					<a class="download-link" ng-hide="reachedEnd" download="{{user}}_{{project}}_report.json" ng-href="{{ rawReport }}">Download report</a>
         </div>
 		</div>
 	</div>
