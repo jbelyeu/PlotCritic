@@ -58,6 +58,7 @@
 				</div>
 			    <div class="button_box" ng-class="currentImage">
             <button type="button" class="score_button" ng-repeat="answer in curationAnswers" ng-click=saveScore(answer[0])>{{answer[1]}} ({{answer[0]}})</button>
+						<p ng-show="selectedScore">You selected: <em>{{selectedScore}} </em></p>
 				</div>
 			</div>
 

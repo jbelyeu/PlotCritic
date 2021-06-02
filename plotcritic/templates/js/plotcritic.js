@@ -32,6 +32,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window, 
 	$scope.additionalCurationItems = __env.config.additionalCuration;
 	$scope.additionalCurationResponses = {};
   $scope.config = __env.config;
+	$scope.selectedScore = false;
 
 	for (key in __env.config.curationQandA.answers) {
 		$scope.curationAnswers.push([key, __env.config.curationQandA.answers[key]]);
@@ -84,6 +85,12 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window, 
 			$timeout(function() {
 				$scope.load_time = Date.now();
 			}, 100);
+		}
+		if ($scope.image_data[$scope.currentImageIdx]['score']) {
+			$scope.selectedScore = __env.config.curationQandA.answers[$scope.image_data[$scope.currentImageIdx]['score']];
+		}
+		else{
+			$scope.selectedScore = false;
 		}
 	};
 
