@@ -133,8 +133,27 @@ def copy_images(images_dir, config_data, parser):
         )
 
 
-def plotcritic(parser):
-    args = parser.parse_args()
+def validate_required_args(args, parser):
+    required_args = [
+        "project",
+        "images_dir",
+        "curation_question",
+        "curation_answers",
+    ]
+    missing = False
+    error_msg = "\nplotcritic: error: the following arguments are required: "
+    for arg in required_args:
+        if getattr(args, arg) is None:
+            missing = True
+            error_msg += "--{}, ".format(arg)
+    if missing:
+        parser.print_help()
+        sys.exit(error_msg.strip(", "))
+
+
+def plotcritic(args, parser):
+    validate_required_args(args, parser)
+
     config_data = {}
     config_data["projectName"] = args.project
     curation_question, curation_answers = valid_curation(

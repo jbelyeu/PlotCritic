@@ -3,8 +3,8 @@ import argparse
 import sys
 
 from .__init__ import __version__
-from .plotcritic import (plotcritic, samplot_report_fields,
-                         samplot_summary_fields)
+from .annotate import add_annotate
+from .plotcritic import plotcritic, samplot_report_fields, samplot_summary_fields
 
 
 def key_val(arg):
@@ -18,13 +18,12 @@ def setup_args():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
-        "-p", "--project", help="Unique name for the project", required=True,
+        "-p", "--project", help="Unique name for the project",
     )
     parser.add_argument(
         "-i",
         "--images_dir",
         help="directory of images and metadata files for curation",
-        required=True,
     )
     parser.add_argument(
         "-s",
@@ -41,7 +40,6 @@ def setup_args():
         "-q",
         "--curation_question",
         help="The curation question to show in the PlotCritic website.",
-        required=True,
     )
     parser.add_argument(
         "-A",
@@ -50,7 +48,6 @@ def setup_args():
         + "curation answers for the curation question (i.e: 'key1','value1' 'key2','value2').",
         type=key_val,
         nargs="+",
-        required=True,
     )
     parser.add_argument(
         "-R",
@@ -66,6 +63,11 @@ def setup_args():
         + "Space-separated. If omitted, only the image name will be included in report",
         nargs="+",
     )
+    parser.set_defaults(func=plotcritic)
+
+    sub = parser.add_subparsers(title="sub-command", dest="command")
+    sub.required = False
+    add_annotate(sub)
 
     return parser
 
@@ -74,7 +76,10 @@ def main():
     print("\nPLOTCRITIC v{}".format(__version__), file=sys.stderr)
 
     parser = setup_args()
-    plotcritic(parser)
+    args = parser.parse_args()
+    args.func(args, parser)
+
+    # plotcritic(parser)
 
 
 if __name__ == "__main__":
