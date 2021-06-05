@@ -45,7 +45,7 @@ def setup_args():
         "-A",
         "--curation_answers",
         help="colon-separated key,values pairs of 1-letter codes and associated "
-        + "curation answers for the curation question (i.e: 'key1','value1' 'key2','value2').",
+        + "curation answers for the curation question (i.e: 'key1':'value1' 'key2':'value2').",
         type=key_val,
         nargs="+",
     )

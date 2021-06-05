@@ -22,9 +22,17 @@ def add_annotate(parent_parser):
         + "intended to pair with Samplot curation",
     )
     parser.add_argument(
-        "-s", "--scores", help="file of results from PlotCritic scoring", required=True
+        "-s",
+        "--scores",
+        help="file of results from PlotCritic scoring",
+        required=True,
     )
-    parser.add_argument("-v", "--vcf", help="variant file to annotate", required=True)
+    parser.add_argument(
+        "-v",
+        "--vcf",
+        help="variant file to annotate",
+        required=True
+    )
     parser.add_argument(
         "-a",
         "--annotated_outfile",
@@ -81,23 +89,22 @@ def annotate(args, parser):
                 fields = line.split("\t")
                 key = os.path.splitext(os.path.basename(fields[2]))[0]
                 if key not in scored_variants:
-                    scored_variants[key] = {"email": {}}
-                email = fields[1]
-                if email not in scored_variants[key]["email"]:
-                    scored_variants[key]["email"][email] = []
+                    scored_variants[key] = {"user": {}}
+                user = fields[1]
+                if user not in scored_variants[key]["user"]:
+                    scored_variants[key]["user"][user] = []
                 score = fields[3]
-                # response_time = datetime.datetime.fromtimestamp(int(fields[5]))
-                scored_variants[key]["email"][email].append([score, int(fields[5])])
+                scored_variants[key]["user"][user].append([score, int(fields[5])])
 
     for key in scored_variants:
         scored_variants[key]["score_fields"] = dict(score_fields)
 
-        for email in scored_variants[key]["email"]:
+        for user in scored_variants[key]["user"]:
             # latest_timestamp = datetime.datetime.min
             latest_timestamp = 0
             answer = ""
             # find latest answer for each user
-            for entry in scored_variants[key]["email"][email]:
+            for entry in scored_variants[key]["user"][user]:
                 if entry[1] > latest_timestamp:
                     answer = entry[0]
                     latest_timestamp = entry[1]

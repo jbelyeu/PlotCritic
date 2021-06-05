@@ -129,16 +129,15 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window, 
 		    		}
 	    		}
 
-					for (var idx in $scope.curationAnswerIdxs) {
-	    			if (score_item['score'] === $scope.curationAnswerIdxs[idx]) {
-	    				summaryData[img_name][summaryFields.length + parseInt(idx)] += 1.0;
+					for (var score in $scope.curationAnswerIdxs) {
+						if (score_item['score'] === $scope.curationAnswers[score]) {
+	    				summaryData[img_name][summaryFields.length + parseInt(score)] += 1.0;
 	    			}
 	    		}
 	    		summaryData[img_name][summaryData[img_name].length-1] += 1.0;
 					//store scores for downloadable report
 					if (("score" in score_item)) {
 		    		fields_to_show = [score_item['user'],
-		    							score_item['Image'],
 		    							score_item['score'].toString(),
 		    							score_item['load_time'].toString(),
 		    							score_item['response_time'].toString(),
@@ -197,7 +196,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window, 
 		}
 
   	rawHeader += "#A:" + answers.join("\t") + "\n";
-  	header_fields = ["USER","IMAGE", "SCORE", "LOADTIME", "RESPONSETIME", "PROJECT"];
+  	header_fields = ["USER", "SCORE", "LOADTIME", "RESPONSETIME", "PROJECT"];
 		header_fields = header_fields.concat(Object.values(__env.config.reportFields));
   	rawHeader += ("#" + header_fields.join("\t"))
 
@@ -212,7 +211,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window, 
 		for (var key in __env.config.curationQandA.answers) {
 			answers.push(__env.config.curationQandA.answers[key]);
 		}
-		downloadableSummaryHeader += "#A:" + answers.join("\t") + "\n";
+		downloadableSummaryHeader += "#A:" + answers.join("\t") + "\n#";
 		downloadableSummaryHeader += $scope.header.join("\t");
 		summaryRows = [];
 		for (var i = 0; i < $scope.records.length; ++i) {

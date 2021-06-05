@@ -50,7 +50,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window, 
     		var option = '';
     		for (idx in $scope.curationAnswers) {
     			if ($scope.curationAnswers[idx][0] == obj['key']) {
-    				$scope.saveScore(obj['key']);
+    				$scope.saveScore($scope.curationAnswers[idx][1]);
     			}
     		}
     	}
@@ -96,7 +96,7 @@ app.controller("svCtrl", function($scope, $rootScope, $timeout, $http, $window, 
 
   $scope.saveScore = function(option){
   	var now = Date.now();
-  	$scope.image_data[$scope.currentImageIdx]['score'] = option;
+  	$scope.image_data[$scope.currentImageIdx]['score'] = $scope.curationAnswers[option];
     $scope.image_data[$scope.currentImageIdx]['response_time'] = now;
     $scope.image_data[$scope.currentImageIdx]['load_time'] = $scope.load_time;
 		$scope.image_data[$scope.currentImageIdx]['user'] = $scope.user;

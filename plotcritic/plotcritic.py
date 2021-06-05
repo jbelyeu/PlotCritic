@@ -106,6 +106,9 @@ def copy_images(images_dir, config_data, parser):
             ".png",
             ".json",
         ]
+        # ignore html files, created by samplot
+        if img_ext.lower() == ".html":
+            continue
 
         if img_ext.lower() not in allowed_filetypes:
             sys.exit(
