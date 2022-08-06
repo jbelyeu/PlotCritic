@@ -1,6 +1,6 @@
 #!/bin/bash
 
-test -e ssshtest || wget -q https://raw.githubusercontent.com/ryanlayer/ssshtest/master/ssshtest
+test -e ssshtest || curl -s https://raw.githubusercontent.com/ryanlayer/ssshtest/master/ssshtest
 . ssshtest
 
 STOP_ON_FAIL=1
